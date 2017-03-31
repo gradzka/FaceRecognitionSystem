@@ -47,6 +47,7 @@ int main()
 	t_keyboard(camera);
 
 	curl_global_cleanup();
+	delete camera;
 	return 0;
 }
 

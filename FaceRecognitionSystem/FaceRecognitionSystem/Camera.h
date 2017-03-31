@@ -1,7 +1,9 @@
 #pragma once
 #include "libcurl/include/curl/curl.h"
 #include "string"
-using namespace std;
+#include <filesystem>
+#include "opencv2\highgui\highgui.hpp"
+#include <ctime>
 
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl/lib/libcurl_a_debug.lib")
@@ -12,12 +14,13 @@ using namespace std;
 class Camera
 {
 	CURL *curl;
-	string IPAddress;
-	string USERPWD;
+	std::string IPAddress;
+	std::string USERPWD;
 
 public:
-	Camera(string IPAddress, string USERPWD);
+	Camera(std::string IPAddress, std::string USERPWD);
 	~Camera();
+	void captureFrame();
 	void sendMessage(int command);
 };
 
