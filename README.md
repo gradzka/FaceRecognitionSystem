@@ -31,6 +31,7 @@ Microsoft Visual Studio 2017
 * http://opencv.org/
 * https://github.com/yushulx/libcurl-sample
 * http://www.cplusplus.com/forum/windows/105443/#msg569057
+* http://stackoverflow.com/a/25383466
 
 ## License
 MIT

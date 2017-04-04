@@ -91,6 +91,12 @@ void Camera::sendMessage(int command)
 			}
 			case 0x50: //zdjecie (P)
 			{
+				printf("Type directory name where the pictures will be stored:\n");
+				std::string dirName="";
+				scanf_s("%s", dirName);
+				printf("Type number of pictures that will be made:\n");
+				int numberPictures=0;
+				scanf_s("%d", numberPictures);
 				captureFrame();
 				return;
 			}
