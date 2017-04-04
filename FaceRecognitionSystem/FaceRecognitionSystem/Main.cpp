@@ -1,27 +1,6 @@
 #include "Camera.h"
-#include "conio.h"
+#include "Utilities.h"
 
-void printCommandList()
-{
-	printf("BUTTON\tDescription\n");
-	printf("UP\tMove the camera up\n");
-	printf("DOWN\tMove the camera down\n");
-	printf("LEFT\tMove the camera left\n");
-	printf("RIGHT\tMove the camera right\n");
-	printf("H\tMove the camera to home position\n");
-	printf("P\tTake pictures\n");
-	printf("C\tShow command list\n");
-	printf("ESC\tExit the application\n\n");
-}
-void cleanBuffer()
-{
-	unsigned char a = 0;
-	if (_kbhit()) {
-		a = _getch();
-		while (_kbhit())
-			_getch();
-	}
-}
 bool checkKeyboard(Camera *camera, int key)
 {
 	//SHORT x = 0;
@@ -36,14 +15,14 @@ bool checkKeyboard(Camera *camera, int key)
 		}
 		if (key == 0x43)
 		{
-			printCommandList();
+			Utilities::printCommandList();
 		}
 		if (key == 0x50)
 		{
-			cleanBuffer();
+			Utilities::cleanBuffer();
 		}
 		camera->sendMessage(key);
-		
+
 		while (GetAsyncKeyState(key) & 0x8000)
 		{
 			//x = GetAsyncKeyState(key);
@@ -57,10 +36,8 @@ bool checkKeyboard(Camera *camera, int key)
 	}
 	return 0;
 }
-
 void t_keyboard(Camera *camera)
 {
-	printf("Keyboard!!!\n");
 	bool state = 0;
 	while (!state)
 	{
@@ -71,13 +48,36 @@ void t_keyboard(Camera *camera)
 		checkKeyboard(camera, 0x48);			//home posiotion (H)
 		checkKeyboard(camera, 0x50);			//take picture (P)
 		checkKeyboard(camera, 0x43);			//command list
-		state=checkKeyboard(camera, VK_ESCAPE);	//exit
+		state= checkKeyboard(camera, VK_ESCAPE);//exit
 	}
 }
-
+void printLogo()
+{
+	std::cout << "  ___" << std::endl;
+	std::cout << " | __| __ _  __  ___" << std::endl;
+	std::cout << " | _| / _` |/ _|/ -_)" << std::endl;
+	std::cout << " |_|  \\__,_|\\__|\\___|" << std::endl;
+	std::cout << "  ___                            _  _    _" << std::endl;
+	std::cout << " | _ \\ ___  __  ___  __ _  _ _  (_)| |_ (_) ___  _ _" << std::endl;
+	std::cout << " |   \/\/ -_)\/ _|\/ _ \\\/ _` || ' \\ | ||  _|| |\/ _ \\| ' \\ " << std::endl;
+	std::cout << " |_|_\\\\___|\\__|\\___\/\\__, ||_||_||_| \\__||_|\\___\/|_||_|" << std::endl;
+	std::cout << "  ___            _  |___\/" << std::endl;
+	std::cout << " / __| _  _  ___| |_  ___  _ __ " << std::endl;
+	std::cout << " \\__ \\| || |(_-<|  _|/ -_)| '  \\ " << std::endl;
+	std::cout << " |___/ \\_, |/__/ \\__|\\___||_|_|_| " << std::endl;
+	std::cout << "       |__/ " << std::endl << std::endl << std::endl;
+}
 int main(int argc, char *argv[])
 {
-	Camera *camera = new Camera("IP", "Login:Password");
+	system("cls");
+
+	printLogo();
+
+	std::cout << "HELP - C" << std::endl;
+	std::cout << "Type: ";
+
+	
+	Camera *camera = new Camera("IP", "login:password");
 	if (argc<=1) //no parameters
 	{
 		t_keyboard(camera);

@@ -4,52 +4,100 @@ Camera::Camera(std::string IPAddress, std::string USERPWD)
 {
 	this->IPAddress = IPAddress;
 	this->USERPWD = USERPWD;
-
-	//create folder, where images will be stored
-	std::experimental::filesystem::create_directory(this->IPAddress);
 }
 
 Camera::~Camera()
 {
 }
+int Camera::empty_stream(std::istream & is) {
 
+	std::streambuf * pbuf = std::cin.rdbuf();
+	std::streamsize size = pbuf->in_avail();
+
+	if (size)
+	{
+		if (!is.good())
+			return 0;
+		is.sync();
+		return 1;
+	}
+	else
+		return -1;
+}
 void Camera::captureFrame()
 {
-	cv::VideoCapture vcap;
-	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://"+ this->USERPWD +"@"+this->IPAddress+"/live/ch0";
+	std::string dirName;
+	std::cout << std::endl;
+	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
 
-	if (!vcap.open(videoStreamAdress))
+	Utilities::cleanBuffer();
+	std::cin.ignore();
+	if (std::cin.good()==false || std::cin.eof())
 	{
-		printf("Error opening video stream or file\n");
-		return;
+		std::cin.clear();
+		std::cin.ignore(MAXINT, '\n');
 	}
 
-	std::time_t t = std::time(NULL);
-	char FileName[20];
-	std::string FileNameS;
-	struct tm timeinfo;
-	localtime_s(&timeinfo, &t);
+	
+	std::getline(std::cin, dirName);	
+	std::cout << "Type number of pictures that will be made:" << std::endl;
+	int numberOfPictures = 0;
+	std::cin >> numberOfPictures;
+	std::cout << "wait..." << std::endl;
 
-	if (std::strftime(FileName, sizeof(FileName), "%F %H-%M-%S", &timeinfo))
-	{
-		if (vcap.read(image))
+	if (numberOfPictures > 0) {
+
+		//create folder, where images will be stored
+		std::experimental::filesystem::create_directory("screenshots/" + dirName);
+
+		cv::VideoCapture vcap;
+		cv::Mat image;
+		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
+
+		if (!vcap.open(videoStreamAdress))
 		{
-			FileNameS = this->IPAddress + "/";
-			FileNameS += std::string(FileName);
-			FileNameS += ".png";
-			cv::imwrite(FileNameS, image);			
+			std::cout << "Error opening video stream or file" << std::endl;
+			return;
 		}
-		else
-		{
-			printf("No frame captured!\n");
-		}
+
+		std::time_t time;
+		char FileName[20];
+		std::string FileNameS;
+		struct tm timeinfo;
+
+		do {
+			time = std::time(NULL);
+			localtime_s(&timeinfo, &time);
+			if (std::strftime(FileName, sizeof(FileName), "%F %H-%M-%S", &timeinfo))
+			{
+				if (vcap.read(image))
+				{
+					FileNameS = "screenshots/" + dirName + "/";
+					FileNameS += std::string(FileName);
+					FileNameS += ".png";
+					cv::imwrite(FileNameS, image);
+				}
+				else
+				{
+					std::cout << "No frame captured!" << std::endl;
+					return;
+				}
+				numberOfPictures--;
+			}
+			else
+			{
+				std::cout << "Problem with file creation!" << std::endl;
+				return;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		} while (numberOfPictures > 0);
+		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;	
 	}
 	else
 	{
-		printf("Problem with file creation!");
-		return;
+		std::cout << "Error! No screenshots were taken."<<std::endl;
 	}
+	std::cout << "Type:";
 }
 void Camera::sendMessage(int command)
 {
@@ -91,13 +139,7 @@ void Camera::sendMessage(int command)
 			}
 			case 0x50: //zdjecie (P)
 			{
-				printf("Type directory name where the pictures will be stored:\n");
-				std::string dirName="";
-				scanf_s("%s", dirName);
-				printf("Type number of pictures that will be made:\n");
-				int numberPictures=0;
-				scanf_s("%d", numberPictures);
-				captureFrame();
+				captureFrame();				
 				return;
 			}
 			case 0: //zatrzymaj kamere

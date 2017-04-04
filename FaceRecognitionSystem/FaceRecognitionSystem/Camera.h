@@ -4,6 +4,9 @@
 #include <filesystem>
 #include "opencv2\highgui\highgui.hpp"
 #include <ctime>
+#include <iostream>
+#include <thread>
+#include "Utilities.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl/lib/libcurl_a_debug.lib")
@@ -22,5 +25,6 @@ public:
 	~Camera();
 	void captureFrame();
 	void sendMessage(int command);
+	int empty_stream(std::istream & is);
 };
 
