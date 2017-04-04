@@ -9,21 +9,6 @@ Camera::Camera(std::string IPAddress, std::string USERPWD)
 Camera::~Camera()
 {
 }
-int Camera::empty_stream(std::istream & is) {
-
-	std::streambuf * pbuf = std::cin.rdbuf();
-	std::streamsize size = pbuf->in_avail();
-
-	if (size)
-	{
-		if (!is.good())
-			return 0;
-		is.sync();
-		return 1;
-	}
-	else
-		return -1;
-}
 void Camera::captureFrame()
 {
 	std::string dirName;

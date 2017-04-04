@@ -25,6 +25,5 @@ public:
 	~Camera();
 	void captureFrame();
 	void sendMessage(int command);
-	int empty_stream(std::istream & is);
 };
 

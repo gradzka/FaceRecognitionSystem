@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AES256\aes256.hpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="libcurl\include\curl\curl.h" />
     <ClInclude Include="libcurl\include\curl\curlbuild.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AES256\aes256.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Utilities.cpp" />

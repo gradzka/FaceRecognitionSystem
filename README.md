@@ -32,6 +32,8 @@ Microsoft Visual Studio 2017
 * https://github.com/yushulx/libcurl-sample
 * http://www.cplusplus.com/forum/windows/105443/#msg569057
 * http://stackoverflow.com/a/25383466
+* http://stackoverflow.com/a/106223
+* https://github.com/Urban82/Aes256
 
 ## License
 MIT

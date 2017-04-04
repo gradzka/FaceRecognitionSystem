@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Utilities.h"
+#include <regex>
 
 bool checkKeyboard(Camera *camera, int key)
 {
@@ -67,17 +68,88 @@ void printLogo()
 	std::cout << " |___/ \\_, |/__/ \\__|\\___||_|_|_| " << std::endl;
 	std::cout << "       |__/ " << std::endl << std::endl << std::endl;
 }
+Camera* cameraConfiguration()
+{
+	std::cout << "*** Connection configuration with IP camera. ***" << std::endl << std::endl;
+	std::cout << "Type:" << std::endl;
+	std::cout << "1 - manual configuration," << std::endl;
+	std::cout << "2 - using an existing configuration file," << std::endl;
+	std::cout << "3 - Configuration file creation and connection setup." << std::endl;
+	int choice = 0;
+	std::string cameraIP = "";
+	std::string login = "";
+	std::string Password = "";
+	std::string loginPassword = "";
+	std::regex cameraIPpattern("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+
+	do {
+		std::cout << "choice: ";
+		std::cin >> choice;
+	} while (choice<=0 || choice>3);
+
+	Camera* camera = NULL;
+
+	switch (choice)
+	{
+		case 1: //manual TODO
+		{
+			do {
+				std::cout << "Type camera adress IP" << std::endl;
+				std::cout << "compatible with format: xxx.xxx.xxx.xxx" << std::endl;
+				std::cin >> cameraIP;				
+			} while (std::regex_match(cameraIP, cameraIPpattern) == false);
+
+			std::cout << "Type login" << std::endl;
+			std::cin >> login;
+			std::cout << "Type password" << std::endl;
+			std::cin >> Password;
+
+			loginPassword = login + ":" + Password;
+
+			camera = new Camera(cameraIP, loginPassword);
+			/*std::cout << "Test connection." << std::endl;
+			std::cout<<"wait..." << std::endl;
+			*/
+			break;
+		}
+		case 2: //existing TODO
+		{
+			break;
+			/*std::cout << "Test connection." << std::endl;
+			std::cout<<"wait..." << std::endl;
+			TODO
+			*/
+		}
+		case 3: //creation and setup TODO
+		{
+			break;
+			/*std::cout << "Test connection." << std::endl;
+			std::cout<<"wait..." << std::endl;
+			*/
+		}
+		default:
+		{
+			break;
+		}
+	}
+
+	//getline
+	//getline
+
+	return camera;
+
+}
 int main(int argc, char *argv[])
 {
 	system("cls");
 
 	printLogo();
-
+	//Camera *camera = cameraConfiguration(); //TODO
+	Camera * camera = new Camera("IP","login:password");
+	
 	std::cout << "HELP - C" << std::endl;
 	std::cout << "Type: ";
-
 	
-	Camera *camera = new Camera("IP", "login:password");
 	if (argc<=1) //no parameters
 	{
 		t_keyboard(camera);
