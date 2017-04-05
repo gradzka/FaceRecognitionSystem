@@ -1,39 +1,18 @@
 #include "Camera.h"
-#include "Utilities.h"
 #include <regex>
 
 bool checkKeyboard(Camera *camera, int key)
 {
-	//SHORT x = 0;
 	if (GetAsyncKeyState(key) & 0x8000) //change sign of number
 	{
-		//printf("%d UP!!!\n", key); // x & 0x8000 = 32768
-		//x = GetAsyncKeyState(key);
-		//printf("%d!!!\n", x & 0x8000);
-		if (key == VK_ESCAPE)
-		{
-			return 1;
-		}
-		if (key == 0x43)
-		{
-			Utilities::printCommandList();
-		}
-		if (key == 0x50)
-		{
-			Utilities::cleanBuffer();
-		}
+		if (key == VK_ESCAPE) {	return 1; }
+		if (key == VK_COMMAND) { Utilities::printCommandList(); }
+		if (key == VK_PICTURE) { Utilities::cleanBuffer(); }
 		camera->sendMessage(key);
 
-		while (GetAsyncKeyState(key) & 0x8000)
-		{
-			//x = GetAsyncKeyState(key);
-		}
-		if (key < 0x25 || key > 0x28)
-		{
-			return 0;
-		}
+		while (GetAsyncKeyState(key) & 0x8000) { }
+		if (key < VK_LEFT || key > VK_DOWN) { return 0; }
 		camera->sendMessage(0);
-		//printf("%d DOWN!!!\n", key); // x & 0x8000 = 0
 	}
 	return 0;
 }
@@ -46,10 +25,10 @@ void t_keyboard(Camera *camera)
 		checkKeyboard(camera, VK_DOWN);			//down
 		checkKeyboard(camera, VK_LEFT);			//left
 		checkKeyboard(camera, VK_RIGHT);		//right
-		checkKeyboard(camera, 0x48);			//home posiotion (H)
-		checkKeyboard(camera, 0x50);			//take picture (P)
-		checkKeyboard(camera, 0x43);			//command list
-		state= checkKeyboard(camera, VK_ESCAPE);//exit
+		checkKeyboard(camera, VK_HOME);			//home posiotion (H)
+		checkKeyboard(camera, VK_PICTURE);		//take picture (P)
+		checkKeyboard(camera, VK_COMMAND);		//command list
+		state=checkKeyboard(camera, VK_ESCAPE);	//exit
 	}
 }
 void printLogo()

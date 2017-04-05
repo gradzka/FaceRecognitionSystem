@@ -14,6 +14,10 @@
 #pragma comment(lib, "libcurl/lib/libcurl_a.lib")
 #endif
 
+#define VK_HOME 0x48
+#define VK_PICTURE 0x50
+#define VK_COMMAND 0x43
+
 class Camera
 {
 	CURL *curl;

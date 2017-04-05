@@ -117,12 +117,12 @@ void Camera::sendMessage(int command)
 				URL += "right";
 				break;
 			}
-			case 0x48: //pozycja domowa (H)
+			case VK_HOME: //pozycja domowa (H)
 			{
 				URL += "home";
 				break;
 			}
-			case 0x50: //zdjecie (P)
+			case VK_PICTURE: //zdjecie (P)
 			{
 				captureFrame();				
 				return;
