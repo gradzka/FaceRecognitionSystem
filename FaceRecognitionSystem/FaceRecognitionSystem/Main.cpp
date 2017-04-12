@@ -62,7 +62,7 @@ Camera* cameraConfiguration()
 	std::regex cameraIPpattern("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
 	do {
-		std::cout << "choice: ";
+		std::cout << "Choice: ";
 		std::cin >> choice;
 	} while (choice<=0 || choice>3);
 
@@ -82,7 +82,6 @@ Camera* cameraConfiguration()
 			std::cin >> login;
 			std::cout << "Type password" << std::endl;
 			
-			std::string password ="";
 			char c = ' ';
 			while (true) 
 			{
@@ -91,7 +90,7 @@ Camera* cameraConfiguration()
 				else
 				{
 					printf("*");
-					password += c;
+					Password += c;
 				}
 			}
 			std::cout << std::endl;
@@ -99,9 +98,19 @@ Camera* cameraConfiguration()
 			loginPassword = login + ":" + Password;
 
 			camera = new Camera(cameraIP, loginPassword);
-			/*std::cout << "Test connection." << std::endl;
+
+			std::cout << "Test connection." << std::endl;
 			std::cout<<"wait..." << std::endl;
-			*/
+			if (camera->testConnection() == true)
+			{
+				std::cout << "Test connection succeeded." << std::endl << std::endl;
+			}
+			else
+			{
+				camera = NULL;
+				std::cout << "Test connection failed." << std::endl << std::endl;
+			}
+
 			break;
 		}
 		case 2: //existing TODO
@@ -136,7 +145,12 @@ int main(int argc, char *argv[])
 	system("cls");
 
 	printLogo();
-	Camera *camera = cameraConfiguration(); //TODO
+	Camera *camera;
+	do
+	{
+		camera = cameraConfiguration(); //TODO
+	} while (camera == NULL);
+
 	//Camera * camera = new Camera("IP","login:password");
 	
 	std::cout << "HELP - C" << std::endl;

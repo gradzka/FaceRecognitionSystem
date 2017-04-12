@@ -40,3 +40,7 @@ void Utilities::cleanBuffer()
 		std::cin.ignore(INT_MAX, '\n');
 	}
 }
+size_t Utilities::write_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
+	return size * nmemb;
+}

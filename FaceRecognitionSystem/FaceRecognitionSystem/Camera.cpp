@@ -9,6 +9,37 @@ Camera::Camera(std::string IPAddress, std::string USERPWD)
 Camera::~Camera()
 {
 }
+
+bool Camera::testConnection()
+{
+	curl = curl_easy_init();
+	if (curl)
+	{
+		CURLcode res;
+		curl_easy_setopt(curl, CURLOPT_USERPWD, USERPWD.c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.28 Safari/537.36");
+		std::string URL = "http://" + IPAddress;
+		curl_easy_setopt(curl, CURLOPT_URL, URL.c_str());
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Utilities::write_data);
+		res = curl_easy_perform(curl);
+		if (res == 0)
+		{
+			int httpCode = 0;
+			res = curl_easy_getinfo(curl, CURLINFO_HTTP_CODE, &httpCode);
+			if (httpCode == 200)
+			{
+				curl_easy_cleanup(curl);
+				return true;
+			}
+		}
+		curl_easy_cleanup(curl);
+	}
+	return false;
+
+}
+
 void Camera::captureFrame()
 {
 	std::string dirName;

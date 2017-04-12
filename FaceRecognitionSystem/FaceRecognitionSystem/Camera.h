@@ -27,6 +27,7 @@ class Camera
 public:
 	Camera(std::string IPAddress, std::string USERPWD);
 	~Camera();
+	bool testConnection();
 	void captureFrame();
 	void sendMessage(int command);
 };
