@@ -1,6 +1,7 @@
 #include "Utilities.h"
 
 
+
 Utilities::Utilities()
 {
 }
@@ -31,5 +32,11 @@ void Utilities::cleanBuffer()
 		a = _getch();
 		while (_kbhit())
 			_getch();
+	}
+	std::cin.ignore();
+	if (std::cin.good()==false || std::cin.eof())
+	{
+		std::cin.clear();
+		std::cin.ignore(INT_MAX, '\n');
 	}
 }

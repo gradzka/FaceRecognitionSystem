@@ -16,13 +16,6 @@ void Camera::captureFrame()
 	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
 
 	Utilities::cleanBuffer();
-	std::cin.ignore();
-	if (std::cin.good()==false || std::cin.eof())
-	{
-		std::cin.clear();
-		std::cin.ignore(MAXINT, '\n');
-	}
-
 	
 	std::getline(std::cin, dirName);	
 	std::cout << "Type number of pictures that will be made:" << std::endl;

@@ -81,7 +81,20 @@ Camera* cameraConfiguration()
 			std::cout << "Type login" << std::endl;
 			std::cin >> login;
 			std::cout << "Type password" << std::endl;
-			std::cin >> Password;
+			
+			std::string password ="";
+			char c = ' ';
+			while (true) 
+			{
+				c = _getch();
+				if (c == 13) { break; } //13 - ENTER
+				else
+				{
+					printf("*");
+					password += c;
+				}
+			}
+			std::cout << std::endl;
 
 			loginPassword = login + ":" + Password;
 
@@ -123,8 +136,8 @@ int main(int argc, char *argv[])
 	system("cls");
 
 	printLogo();
-	//Camera *camera = cameraConfiguration(); //TODO
-	Camera * camera = new Camera("IP","login:password");
+	Camera *camera = cameraConfiguration(); //TODO
+	//Camera * camera = new Camera("IP","login:password");
 	
 	std::cout << "HELP - C" << std::endl;
 	std::cout << "Type: ";
