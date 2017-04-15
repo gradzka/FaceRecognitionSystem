@@ -168,3 +168,42 @@ void Camera::sendMessage(int command)
 		curl_easy_cleanup(curl);
 	}
 }
+Camera* Camera::typeCameraData()
+{
+	Camera *camera = NULL;
+	std::string cameraIP = "";
+	std::string login = "";
+	std::string password = "";
+	std::string loginPassword = "";
+	std::regex cameraIPpattern("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+
+	do {
+		std::cout << "Type camera adress IP" << std::endl;
+		std::cout << "compatible with format: xxx.xxx.xxx.xxx" << std::endl;
+		std::cin >> cameraIP;
+	} while (std::regex_match(cameraIP, cameraIPpattern) == false);
+
+	std::cout << "Type login" << std::endl;
+	std::cin >> login;
+
+	std::cout << "Type password" << std::endl;
+	Utilities::maskPassword(password);
+
+	loginPassword = login + ":" + password;
+
+	camera = new Camera(cameraIP, loginPassword);
+
+	std::cout << "Test connection." << std::endl;
+	std::cout << "wait..." << std::endl;
+	if (camera->testConnection() == true)
+	{
+		std::cout << "Test connection succeeded." << std::endl << std::endl;
+	}
+	else
+	{
+		camera = NULL;
+		std::cout << "Test connection failed." << std::endl << std::endl;
+	}
+
+	return camera;
+}

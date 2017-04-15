@@ -52,14 +52,9 @@ Camera* cameraConfiguration()
 	std::cout << "*** Connection configuration with IP camera. ***" << std::endl << std::endl;
 	std::cout << "Type:" << std::endl;
 	std::cout << "1 - manual configuration," << std::endl;
-	std::cout << "2 - using an existing configuration file," << std::endl;
-	std::cout << "3 - Configuration file creation and connection setup." << std::endl;
+	std::cout << "2 - make config file," << std::endl;
+	std::cout << "3 - file configuration." << std::endl;
 	int choice = 0;
-	std::string cameraIP = "";
-	std::string login = "";
-	std::string Password = "";
-	std::string loginPassword = "";
-	std::regex cameraIPpattern("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
 	do {
 		std::cout << "Choice: ";
@@ -70,72 +65,26 @@ Camera* cameraConfiguration()
 
 	switch (choice)
 	{
-		case 1: //manual TODO
+		case 1:
 		{
-			do {
-				std::cout << "Type camera adress IP" << std::endl;
-				std::cout << "compatible with format: xxx.xxx.xxx.xxx" << std::endl;
-				std::cin >> cameraIP;				
-			} while (std::regex_match(cameraIP, cameraIPpattern) == false);
-
-			std::cout << "Type login" << std::endl;
-			std::cin >> login;
-			std::cout << "Type password" << std::endl;
-			
-			char c = ' ';
-			while (true) 
-			{
-				c = _getch();
-				if (c == 13) { break; } //13 - ENTER
-				else
-				{
-					printf("*");
-					Password += c;
-				}
-			}
-			std::cout << std::endl;
-
-			loginPassword = login + ":" + Password;
-
-			camera = new Camera(cameraIP, loginPassword);
-
-			std::cout << "Test connection." << std::endl;
-			std::cout<<"wait..." << std::endl;
-			if (camera->testConnection() == true)
-			{
-				std::cout << "Test connection succeeded." << std::endl << std::endl;
-			}
-			else
-			{
-				camera = NULL;
-				std::cout << "Test connection failed." << std::endl << std::endl;
-			}
-
+			camera->typeCameraData(); //if null test connection failed
 			break;
 		}
-		case 2: //existing TODO
+		case 2:
 		{
 			break;
-			/*std::cout << "Test connection." << std::endl;
-			std::cout<<"wait..." << std::endl;
-			TODO
-			*/
+
 		}
 		case 3: //creation and setup TODO
 		{
 			break;
-			/*std::cout << "Test connection." << std::endl;
-			std::cout<<"wait..." << std::endl;
-			*/
+
 		}
 		default:
 		{
 			break;
 		}
 	}
-
-	//getline
-	//getline
 
 	return camera;
 

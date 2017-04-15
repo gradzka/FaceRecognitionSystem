@@ -30,5 +30,6 @@ public:
 	bool testConnection();
 	void captureFrame();
 	void sendMessage(int command);
+	Camera* typeCameraData();
 };
 

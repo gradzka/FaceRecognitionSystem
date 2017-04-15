@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DES.h" />
     <ClInclude Include="libcurl\include\curl\curl.h" />
     <ClInclude Include="libcurl\include\curl\curlbuild.h" />
     <ClInclude Include="libcurl\include\curl\curlrules.h" />
@@ -137,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DES.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>

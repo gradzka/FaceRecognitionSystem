@@ -44,3 +44,22 @@ size_t Utilities::write_data(void *buffer, size_t size, size_t nmemb, void *user
 {
 	return size * nmemb;
 }
+void Utilities::maskPassword(std::string &password)
+{
+	char c = ' ';
+	while (true)
+	{
+		c = _getch();
+		if (c == 13) { break; } //13 - ENTER
+		else if (c == 8)
+		{
+			password.pop_back();
+		}
+		else
+		{
+			password.push_back(c);
+		}
+	}
+	std::cout << std::endl;
+}
+
