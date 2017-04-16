@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "DES.h"
 #include <regex>
 
 bool checkKeyboard(Camera *camera, int key)
@@ -52,8 +53,8 @@ Camera* cameraConfiguration()
 	std::cout << "*** Connection configuration with IP camera. ***" << std::endl << std::endl;
 	std::cout << "Type:" << std::endl;
 	std::cout << "1 - manual configuration," << std::endl;
-	std::cout << "2 - make config file," << std::endl;
-	std::cout << "3 - file configuration." << std::endl;
+	std::cout << "2 - file configuration," << std::endl;
+	std::cout << "3 - make config file." << std::endl;
 	int choice = 0;
 
 	do {
@@ -67,18 +68,29 @@ Camera* cameraConfiguration()
 	{
 		case 1:
 		{
-			camera->typeCameraData(); //if null test connection failed
+			camera->typeCameraData();
 			break;
 		}
 		case 2:
 		{
+			Camera *camera = NULL;
+			DES * des = new DES();
+			des->EncryptDecrypt(false);
+			des->readEncryptedData(camera);
+			camera->testConnection(camera);
 			break;
-
 		}
-		case 3: //creation and setup TODO
+		case 3:
 		{
+			camera->typeCameraData();
+			if (camera != NULL)
+			{
+				DES *des = new DES();
+				std::string SecretData = camera->getIPaddress() + "," + camera->getUSERPWD();
+				des->EncryptDecrypt(true, SecretData);
+				std::cout << "Your data was encrypted with DES algorithm and saved in config.bin" << std::endl;
+			}
 			break;
-
 		}
 		default:
 		{
@@ -92,9 +104,9 @@ Camera* cameraConfiguration()
 int main(int argc, char *argv[])
 {
 	system("cls");
-
 	printLogo();
 	Camera *camera;
+
 	do
 	{
 		camera = cameraConfiguration(); //TODO

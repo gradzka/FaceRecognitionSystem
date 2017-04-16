@@ -63,3 +63,20 @@ void Utilities::maskPassword(std::string &password)
 	std::cout << std::endl;
 }
 
+std::vector<std::string> Utilities::split(std::string str, char delimeter)
+{
+	std::vector<std::string> internal;
+	std::stringstream ss(str);
+	std::string tok;
+
+	while (std::getline(ss, tok, delimeter))
+	{
+		internal.push_back(tok);
+	}
+
+	return internal;
+}
+
+
+
+

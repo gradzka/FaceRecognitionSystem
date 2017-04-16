@@ -27,9 +27,14 @@ class Camera
 public:
 	Camera(std::string IPAddress, std::string USERPWD);
 	~Camera();
-	bool testConnection();
+	std::string getIPaddress() { return IPAddress; }
+	std::string getUSERPWD() { return USERPWD; }
+	void setIPaddress(std::string IPAddr) { IPAddress = IPAddr; }
+	void setUSERPWD(std::string UserPwd) { USERPWD = UserPwd; }
 	void captureFrame();
 	void sendMessage(int command);
 	Camera* typeCameraData();
+	bool testConnectionCurl();
+	void testConnection(Camera *& camera);
 };
 

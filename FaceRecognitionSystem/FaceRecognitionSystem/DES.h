@@ -1,10 +1,12 @@
 #pragma once
+#include "Utilities.h"
 #include "stdint.h"
 #include "stdio.h"
 #include <string>
 #include <sstream>
 #include <bitset>
 #include <iostream>
+
 class DES
 {
 public:
@@ -150,9 +152,10 @@ public:
 	void rounds(uint64_t *data, uint64_t key);
 	std::string DES::stringToBinary(std::string yourString);
 	uint64_t binStringToUint(std::string binary);
-	//std::string binaryToString(std::string binary);
-	//std::string UintToBinary(uint64_t decimal);
+	std::string binaryToString(std::string binary);
+	std::string UintToBinary(uint64_t decimal);
 	void DESAlgorithm(bool encDecOption, const char* input, const char* output);
-	void EncryptDecrypt(bool EncDecOption);
+	void EncryptDecrypt(bool EncDecOption, std::string secretData="");
+	void DES::readEncryptedData(Camera *&camera);
 };
 

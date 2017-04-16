@@ -122,10 +122,6 @@ void DES::key_schedule(uint64_t* key, uint64_t* next_key, int round)
 
 	for (int ii = 0; ii < 48; ii++)
 		addbit(key, *next_key, PC2[ii] - 1, ii);
-
-	// All Good!
-	// Use key in the DES rounds.
-	// Use next_key in this function again as the new key to change
 }
 void DES::rounds(uint64_t *data, uint64_t key)
 {
@@ -206,52 +202,52 @@ uint64_t DES::binStringToUint(std::string binary)
 	}
 
 	return uint;
-}/*
+}
  std::string DES::binaryToString(std::string binary)
  {
- std::stringstream sstream(binary);
- std::string output;
- while (sstream.good())
- {
- std::bitset<8> bits;
- sstream >> bits;
- char c = char(bits.to_ulong());
- output += c;
- }
+	std::stringstream sstream(binary);
+	std::string output;
+	 while (sstream.good())
+	 {
+		std::bitset<8> bits;
+		sstream >> bits;
+		char c = char(bits.to_ulong());
+		output += c;
+	}
 
- return output;
+	return output;
  }
  std::string DES::UintToBinary(uint64_t decimal)
  {
- std::string binary, newBinary = "";
- std::string::reverse_iterator iter;
- uint64_t remainder;
+	std::string binary, newBinary = "";
+	std::string::reverse_iterator iter;
+	uint64_t remainder;
 
- while (decimal > 0)
- {
- remainder = decimal % 2;
+	while (decimal > 0)
+	{
+		remainder = decimal % 2;
 
- if (remainder == 0)
- binary += '0';
- else if (remainder == 1)
- binary += '1';
+	if (remainder == 0)
+	binary += '0';
+	else if (remainder == 1)
+	binary += '1';
 
- decimal /= 2;
+	decimal /= 2;
+	}
+
+	for (iter = binary.rbegin(); iter != binary.rend(); iter++)
+	{
+		newBinary += *iter;
+	}
+
+	return newBinary;
  }
 
- for (iter = binary.rbegin(); iter != binary.rend(); iter++)
- {
- newBinary += *iter;
- }
-
- return newBinary;
- }*/
-
-
-//Do wdrozenia
 void DES::DESAlgorithm(bool encDecOption, const char* input, const char* output)
 {
 	std::string secretKey = "";
+	std::cout << "Podaj klucz" << std::endl;
+	Utilities::maskPassword(secretKey);
 	//wczytaj klucz od uzytkownika
 
 	DES *des = new DES();
@@ -315,22 +311,19 @@ void DES::DESAlgorithm(bool encDecOption, const char* input, const char* output)
 			data = data << (8 * (8 - amount));
 
 
-		// Write output
-		/*if (encDecOption == true) { fwrite(&data, 1, amount, out); }
-		data = 0;*/
 		fwrite(&data, 1, amount, out);
+
+		data = 0;
 	}
 	fclose(in);
 	fclose(out);
+
 }
-void DES::EncryptDecrypt(bool EncDecOption) //if EncDecOption is true then Encryption else Decryption
+void DES::EncryptDecrypt(bool EncDecOption, std::string SecretData) //if EncDecOption is true then Encryption else Decryption
 {
 	//type secret key
 	if (EncDecOption == true)
 	{
-		std::string SecretData = "Sekret";
-		//type secret data
-
 		// 1.Save data typed by user to .bin file
 		if (SecretData.length() % 8 != 0) { SecretData.insert(SecretData.length(), 8 - SecretData.length() % 8, ' '); }
 		SecretData += '\n';
@@ -348,17 +341,18 @@ void DES::EncryptDecrypt(bool EncDecOption) //if EncDecOption is true then Encry
 	}
 	else
 	{
-		DESAlgorithm(false, "config.bin", "output2");
+		DESAlgorithm(false, "config.bin", "log.bin");
 	}
 }
-void readEncryptedData()
+
+void DES::readEncryptedData(Camera *&camera)
 {
 	FILE * pFile;
 	long lSize;
 	char * buffer;
 	size_t result;
 
-	fopen_s(&pFile, "output2.bin", "rb");
+	fopen_s(&pFile, "log.bin", "rb");
 	if (pFile == NULL) { fputs("File error", stderr); exit(1); }
 
 	// obtain file size:
@@ -375,13 +369,19 @@ void readEncryptedData()
 	if (result != lSize) { fputs("Reading error", stderr); exit(3); }
 
 	std::string buf(buffer);
-	int newLinePosition = buf.find('\n');
+	int newLinePosition = buf.find(' ');
 	buf = buf.substr(0, newLinePosition);
-	//gdyby skasowac znak nowej linii byly smieci
-	printf("%s\n", buf.c_str());
-	/* the whole file is now loaded in the memory buffer. */
+	newLinePosition = buf.find('\n');
+	buf = buf.substr(0, newLinePosition);
 
-	// terminate
+	//sep[0] camera->getIPaddress()
+	//sep[1] camera->getUSERPWD()
+	std::vector<std::string> sep = Utilities::split(buf, ',');
+	camera->setIPaddress(sep[0]);
+	camera->setUSERPWD(sep[1]);
+
+	// 3. Delete log.bin file
+	remove("log.bin");
 	fclose(pFile);
 	free(buffer);
 }
