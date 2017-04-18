@@ -53,8 +53,8 @@ Camera* cameraConfiguration()
 	std::cout << "*** Connection configuration with IP camera. ***" << std::endl << std::endl;
 	std::cout << "Type:" << std::endl;
 	std::cout << "1 - manual configuration," << std::endl;
-	std::cout << "2 - file configuration," << std::endl;
-	std::cout << "3 - make config file." << std::endl;
+	std::cout << "2 - load configuration from config file," << std::endl;
+	std::cout << "3 - create config file." << std::endl;
 	int choice = 0;
 
 	do {
@@ -68,21 +68,24 @@ Camera* cameraConfiguration()
 	{
 		case 1:
 		{
-			camera->typeCameraData();
+			camera = camera->typeCameraData();
 			break;
 		}
 		case 2:
 		{
-			Camera *camera = NULL;
+			camera = new Camera("", "");
 			DES * des = new DES();
 			des->EncryptDecrypt(false);
 			des->readEncryptedData(camera);
-			camera->testConnection(camera);
+			if (camera!=NULL)
+			{
+				camera->testConnection(camera);
+			}
 			break;
 		}
 		case 3:
 		{
-			camera->typeCameraData();
+			camera = camera->typeCameraData();
 			if (camera != NULL)
 			{
 				DES *des = new DES();

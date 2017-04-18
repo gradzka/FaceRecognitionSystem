@@ -353,7 +353,12 @@ void DES::readEncryptedData(Camera *&camera)
 	size_t result;
 
 	fopen_s(&pFile, "log.bin", "rb");
-	if (pFile == NULL) { fputs("File error", stderr); exit(1); }
+	if (pFile == NULL) 
+	{ 
+		fputs("File error", stderr); 
+		camera = NULL;
+		return;
+	}
 
 	// obtain file size:
 	fseek(pFile, 0, SEEK_END);
@@ -362,26 +367,43 @@ void DES::readEncryptedData(Camera *&camera)
 
 	// allocate memory to contain the whole file:
 	buffer = (char*)malloc(sizeof(char)*lSize);
-	if (buffer == NULL) { fputs("Memory error", stderr); exit(2); }
+	if (buffer == NULL)
+	{ 
+		fputs("Memory error", stderr); 
+		camera = NULL;
+		return;
+	}
 
 	// copy the file into the buffer:
 	result = fread(buffer, 1, lSize, pFile);
-	if (result != lSize) { fputs("Reading error", stderr); exit(3); }
+	if (result != lSize) 
+	{ 
+		fputs("Reading error", stderr); 
+		camera = NULL;
+		return;
+	}
 
 	std::string buf(buffer);
 	int newLinePosition = buf.find(' ');
 	buf = buf.substr(0, newLinePosition);
 	newLinePosition = buf.find('\n');
 	buf = buf.substr(0, newLinePosition);
-
 	//sep[0] camera->getIPaddress()
 	//sep[1] camera->getUSERPWD()
 	std::vector<std::string> sep = Utilities::split(buf, ',');
-	camera->setIPaddress(sep[0]);
-	camera->setUSERPWD(sep[1]);
 
+	if (sep.size()==2)
+	{
+		camera->setIPaddress(sep[0]);
+		camera->setUSERPWD(sep[1]);
+	}
+	else
+	{
+		std::cout<<"Config file is corrupted!\n\n";
+		camera = NULL;
+	}
 	// 3. Delete log.bin file
-	remove("log.bin");
 	fclose(pFile);
+	remove("log.bin");
 	free(buffer);
 }
