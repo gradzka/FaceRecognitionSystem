@@ -15,6 +15,6 @@ class ImgProc
 public:
 	ImgProc();
 	~ImgProc();
-	void detect();
+	void countPeople(std::string userPwd, std::string addressIP);
 };
 

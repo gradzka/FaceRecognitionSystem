@@ -4,6 +4,7 @@ Camera::Camera(std::string IPAddress, std::string USERPWD)
 {
 	this->IPAddress = IPAddress;
 	this->USERPWD = USERPWD;
+	imgproc = new ImgProc();
 }
 
 Camera::~Camera()
@@ -16,7 +17,7 @@ void Camera::captureFrame()
 	std::cout << std::endl;
 	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
 
-	Utilities::cleanBuffer();
+	//Utilities::cleanBuffer();
 	
 	std::getline(std::cin, dirName);	
 	std::cout << "Type number of pictures that will be made:" << std::endl;
@@ -25,7 +26,7 @@ void Camera::captureFrame()
 	std::cout << "wait..." << std::endl;
 
 	if (numberOfPictures > 0) {
-
+		std::experimental::filesystem::create_directory("screenshots/");
 		//create folder, where images will be stored
 		std::experimental::filesystem::create_directory("screenshots/" + dirName);
 
@@ -119,6 +120,11 @@ void Camera::sendMessage(int command)
 			case VK_PICTURE: //zdjecie (P)
 			{
 				captureFrame();				
+				return;
+			}
+			case VK_ATTENDANCE: //zlicz liczbe osob
+			{
+				imgproc->countPeople(this->USERPWD, this->IPAddress);
 				return;
 			}
 			case 0: //zatrzymaj kamere

@@ -29,7 +29,8 @@ void t_keyboard(Camera *camera)
 		checkKeyboard(camera, VK_RIGHT);		//right
 		checkKeyboard(camera, VK_HOME);			//home posiotion (H)
 		checkKeyboard(camera, VK_PICTURE);		//take picture (P)
-		checkKeyboard(camera, VK_COMMAND);		//command list
+		checkKeyboard(camera, VK_COMMAND);		//command list (C)
+		checkKeyboard(camera, VK_ATTENDANCE);	//command list (A)
 		state=checkKeyboard(camera, VK_ESCAPE);	//exit
 	}
 }
@@ -109,10 +110,6 @@ Camera* cameraConfiguration()
 
 int main(int argc, char *argv[])
 {
-	ImgProc *imgproc = new ImgProc();
-	imgproc->detect();
-	//return 0;
-
 	system("cls");
 	printLogo();
 	Camera *camera;

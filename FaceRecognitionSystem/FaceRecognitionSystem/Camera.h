@@ -7,6 +7,7 @@
 #include <iostream>
 #include <thread>
 #include "Utilities.h"
+#include "ImgProc.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "libcurl/lib/libcurl_a_debug.lib")
@@ -14,15 +15,17 @@
 #pragma comment(lib, "libcurl/lib/libcurl_a.lib")
 #endif
 
-#define VK_HOME 0x48
-#define VK_PICTURE 0x50
-#define VK_COMMAND 0x43
+#define VK_HOME			0x48
+#define VK_PICTURE		0x50
+#define VK_COMMAND		0x43
+#define VK_ATTENDANCE	0x41
 
 class Camera
 {
 	CURL *curl;
 	std::string IPAddress;
 	std::string USERPWD;
+	ImgProc *imgproc;
 
 public:
 	Camera(std::string IPAddress, std::string USERPWD);
