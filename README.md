@@ -12,8 +12,10 @@ Project is based on simple console interface used to manipulate IP camera and st
 - [x] analysis of the HTTP messages,
 - [x] communication with the IP camera,
 - [x] making screenshots on demand,
-- [ ] configuration file,
-- [ ] corps preparation,
+- [x] configuration file,
+- [x] corps preparation,
+- [x] face detection,
+- [x] count people,
 - [ ] start learning algorithm,
 - [ ] program modes,
 - [ ] face recognition,
@@ -34,6 +36,12 @@ Microsoft Visual Studio 2017
 * http://stackoverflow.com/a/25383466
 * http://stackoverflow.com/a/106223
 * http://stackoverflow.com/questions/3572397/lib-curl-in-c-disable-printing
+* http://codingstreet.com/c-code-to-hide-input-password/
+* https://github.com/mimoo/DES
+* http://stackoverflow.com/questions/18937892/c-string-to-binary-code-binary-code-to-string
+* https://codereview.stackexchange.com/questions/25381/decimal-binary-hex-converter
+* http://stackoverflow.com/questions/23344257/convert-a-string-of-binary-into-an-ascii-string-c
+* http://stackoverflow.com/questions/236129/split-a-string-in-c
 
 ## License
 MIT
