@@ -1,7 +1,6 @@
 #include "Camera.h"
 #include "DES.h"
 #include <regex>
-#include "ImgProc.h"
 
 bool checkKeyboard(Camera *camera, int key)
 {

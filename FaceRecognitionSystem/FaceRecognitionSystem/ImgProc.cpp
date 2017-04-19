@@ -42,6 +42,33 @@ int ImgProc::detectFace(cv::Mat img)
 	return faces.size();
 }
 
+bool ImgProc::createCSV()
+{
+	std::fstream file;
+	file.open("corp.txt", std::ios::out);
+	if (file.good() != true)
+	{
+		std::cout << "Error!" << std::endl;
+		return false;
+	}
+
+	std::string path = "screenshots/";
+	int numberPerson = -1;
+	for (auto & p : std::experimental::filesystem::recursive_directory_iterator(path))
+	{
+		if (!std::experimental::filesystem::is_directory(p.path()))
+		{
+			file << p << ";" << numberPerson << std::endl;
+		}
+		else
+		{
+			numberPerson++;
+		}
+	}
+	file.close();
+	return true;
+}
+
 void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 {
 	std::cout<<std::endl << "wait..." << std::endl;

@@ -5,6 +5,8 @@
 #include "opencv2/imgproc/imgproc.hpp" 
 #include <string> 
 #include <iostream> 
+#include <filesystem>
+#include <fstream>
 
 class ImgProc
 {
@@ -15,6 +17,7 @@ class ImgProc
 public:
 	ImgProc();
 	~ImgProc();
+	bool createCSV();
 	void countPeople(std::string userPwd, std::string addressIP);
 };
 

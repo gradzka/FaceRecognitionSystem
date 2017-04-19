@@ -72,6 +72,7 @@ void Camera::captureFrame()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		} while (numberOfPictures > 0);
 		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;	
+		imgproc->createCSV();
 	}
 	else
 	{
