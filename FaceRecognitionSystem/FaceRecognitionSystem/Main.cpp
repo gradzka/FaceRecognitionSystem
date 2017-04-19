@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "DES.h"
 #include <regex>
+#include "ImgProc.h"
 
 bool checkKeyboard(Camera *camera, int key)
 {
@@ -104,8 +105,14 @@ Camera* cameraConfiguration()
 	return camera;
 
 }
+
+
 int main(int argc, char *argv[])
 {
+	ImgProc *imgproc = new ImgProc();
+	imgproc->detect();
+	//return 0;
+
 	system("cls");
 	printLogo();
 	Camera *camera;

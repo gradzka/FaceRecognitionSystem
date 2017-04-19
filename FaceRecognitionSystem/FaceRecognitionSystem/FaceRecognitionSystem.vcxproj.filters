@@ -51,6 +51,9 @@
     <ClInclude Include="DES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImgProc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImgProc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

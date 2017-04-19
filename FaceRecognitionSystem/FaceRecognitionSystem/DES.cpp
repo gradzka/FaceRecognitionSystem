@@ -246,7 +246,7 @@ uint64_t DES::binStringToUint(std::string binary)
 void DES::DESAlgorithm(bool encDecOption, const char* input, const char* output)
 {
 	std::string secretKey = "";
-	std::cout << "Podaj klucz" << std::endl;
+	std::cout << "Type key" << std::endl;
 	Utilities::maskPassword(secretKey);
 	//wczytaj klucz od uzytkownika
 
@@ -255,68 +255,71 @@ void DES::DESAlgorithm(bool encDecOption, const char* input, const char* output)
 	FILE * in = NULL;
 	FILE * out = NULL;
 	fopen_s(&in, input, "rb");
-	fopen_s(&out, output, "wb");
-
-	//Convert Key to binary and then to decimal
-	std::string secretKeyBin = des->stringToBinary(secretKey);
-	uint64_t secretKeyDec = des->binStringToUint(secretKeyBin);
-
-	uint64_t a_key[16];
-	a_key[0] = secretKeyDec;
-	uint64_t next_key;
-
-	//Get the 16 subkeys
-	for (int ii = 0; ii < 16; ii++) //dla 0 problem
+	if (in != NULL)
 	{
-		des->key_schedule(&a_key[ii], &next_key, ii);
-		if (ii != 15)
-			a_key[ii + 1] = next_key;
-	}
+		fopen_s(&out, output, "wb");
 
-	//16 Rounds of enc/decryption
-	size_t amount; // Used for fwrite
-	uint64_t data;
+		//Convert Key to binary and then to decimal
+		std::string secretKeyBin = des->stringToBinary(secretKey);
+		uint64_t secretKeyDec = des->binStringToUint(secretKeyBin);
 
-	while ((amount = fread(&data, 1, 8, in)) > 0)
-	{
-		if (amount != 8)
-			data = data << (8 * (8 - amount));
+		uint64_t a_key[16];
+		a_key[0] = secretKeyDec;
+		uint64_t next_key;
 
-		// Initial permutation
-		des->Permutation(&data, true);
-
-		// Encrypt rounds
-		if (encDecOption == 0)
+		//Get the 16 subkeys
+		for (int ii = 0; ii < 16; ii++) //dla 0 problem
 		{
-			for (int ii = 0; ii < 16; ii++)
-				des->rounds(&data, a_key[ii]);
-		}
-		// Decrypt rounds
-		else
-		{
-			// Switching blocks
-			data = (data << 32) + (data >> 32);
-
-			for (int ii = 15; ii >= 0; ii--)
-				des->rounds(&data, a_key[ii]);
-
-			// Switching blocks back
-			data = (data << 32) + (data >> 32);
+			des->key_schedule(&a_key[ii], &next_key, ii);
+			if (ii != 15)
+				a_key[ii + 1] = next_key;
 		}
 
-		// Final permutation
-		des->Permutation(&data, false);
+		//16 Rounds of enc/decryption
+		size_t amount; // Used for fwrite
+		uint64_t data;
 
-		if (amount != 8)
-			data = data << (8 * (8 - amount));
+		while ((amount = fread(&data, 1, 8, in)) > 0)
+		{
+			if (amount != 8)
+				data = data << (8 * (8 - amount));
+
+			// Initial permutation
+			des->Permutation(&data, true);
+
+			// Encrypt rounds
+			if (encDecOption == 0)
+			{
+				for (int ii = 0; ii < 16; ii++)
+					des->rounds(&data, a_key[ii]);
+			}
+			// Decrypt rounds
+			else
+			{
+				// Switching blocks
+				data = (data << 32) + (data >> 32);
+
+				for (int ii = 15; ii >= 0; ii--)
+					des->rounds(&data, a_key[ii]);
+
+				// Switching blocks back
+				data = (data << 32) + (data >> 32);
+			}
+
+			// Final permutation
+			des->Permutation(&data, false);
+
+			if (amount != 8)
+				data = data << (8 * (8 - amount));
 
 
-		fwrite(&data, 1, amount, out);
+			fwrite(&data, 1, amount, out);
 
-		data = 0;
+			data = 0;
+		}
+		fclose(in);
+		fclose(out);
 	}
-	fclose(in);
-	fclose(out);
 
 }
 void DES::EncryptDecrypt(bool EncDecOption, std::string SecretData) //if EncDecOption is true then Encryption else Decryption
@@ -399,7 +402,7 @@ void DES::readEncryptedData(Camera *&camera)
 	}
 	else
 	{
-		std::cout<<"Config file is corrupted!\n\n";
+		std::cout<<"Config file is missed or corrupted!\n\n";
 		camera = NULL;
 	}
 	// 3. Delete log.bin file
