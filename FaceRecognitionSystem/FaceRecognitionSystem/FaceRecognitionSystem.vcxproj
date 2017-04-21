@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AES.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DES.h" />
     <ClInclude Include="ImgProc.h" />
@@ -135,13 +136,16 @@
     <ClInclude Include="libcurl\include\curl\multi.h" />
     <ClInclude Include="libcurl\include\curl\stdcheaders.h" />
     <ClInclude Include="libcurl\include\curl\typecheck-gcc.h" />
+    <ClInclude Include="SHA256.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AES.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DES.cpp" />
     <ClCompile Include="ImgProc.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="SHA256.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
