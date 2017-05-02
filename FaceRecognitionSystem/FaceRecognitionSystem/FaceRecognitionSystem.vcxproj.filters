@@ -21,9 +21,6 @@
     <ClInclude Include="Utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DES.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImgProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImgProc.cpp">

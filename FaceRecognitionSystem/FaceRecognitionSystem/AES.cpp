@@ -14,7 +14,7 @@ void AES::xor_buf(const BYTE in[], BYTE out[], size_t len)
 		out[idx] ^= in[idx];
 }
 
-int AES::aes_encrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const WORD key[], int keysize, const BYTE iv[])
+int AES::aes_encrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const aesWORD key[], int keysize, const BYTE iv[])
 {
 	BYTE buf_in[AES_BLOCK_SIZE], buf_out[AES_BLOCK_SIZE], iv_buf[AES_BLOCK_SIZE];
 	int blocks, idx;
@@ -37,7 +37,7 @@ int AES::aes_encrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const WORD 
 	return(TRUE);
 }
 
-int AES::aes_decrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const WORD key[], int keysize, const BYTE iv[])
+int AES::aes_decrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const aesWORD key[], int keysize, const BYTE iv[])
 {
 	BYTE buf_in[AES_BLOCK_SIZE], buf_out[AES_BLOCK_SIZE], iv_buf[AES_BLOCK_SIZE];
 	int blocks, idx;
@@ -65,7 +65,7 @@ int AES::aes_decrypt_cbc(const BYTE in[], size_t in_len, BYTE out[], const WORD 
 /////////////////
 
 // Substitutes a word using the AES S-Box.
-WORD AES::SubWord(WORD word)
+aesWORD AES::SubWord(aesWORD word)
 {
 	unsigned int result;
 
@@ -79,10 +79,10 @@ WORD AES::SubWord(WORD word)
 // Performs the action of generating the keys that will be used in every round of
 // encryption. "key" is the user-supplied input key, "w" is the output key schedule,
 // "keysize" is the length in bits of "key", must be 128, 192, or 256.
-void AES::aes_key_setup(const BYTE key[], WORD w[], int keysize)
+void AES::aes_key_setup(const BYTE key[], aesWORD w[], int keysize)
 {
 	int Nb = 4, Nr, Nk, idx;
-	WORD temp, Rcon[] = { 0x01000000,0x02000000,0x04000000,0x08000000,0x10000000,0x20000000,
+	aesWORD temp, Rcon[] = { 0x01000000,0x02000000,0x04000000,0x08000000,0x10000000,0x20000000,
 		0x40000000,0x80000000,0x1b000000,0x36000000,0x6c000000,0xd8000000,
 		0xab000000,0x4d000000,0x9a000000 };
 
@@ -116,7 +116,7 @@ void AES::aes_key_setup(const BYTE key[], WORD w[], int keysize)
 // form of 4 integers (the "w" array). Each integer is XOR'd by one column of the state.
 // Also performs the job of InvAddRoundKey(); since the function is a simple XOR process,
 // it is its own inverse.
-void AES::AddRoundKey(BYTE state[][4], const WORD w[])
+void AES::AddRoundKey(BYTE state[][4], const aesWORD w[])
 {
 	BYTE subkey[4];
 
@@ -453,7 +453,7 @@ void AES::InvMixColumns(BYTE state[][4])
 // (En/De)Crypt
 /////////////////
 
-void AES::aes_encrypt(const BYTE in[], BYTE out[], const WORD key[], int keysize)
+void AES::aes_encrypt(const BYTE in[], BYTE out[], const aesWORD key[], int keysize)
 {
 	BYTE state[4][4];
 
@@ -526,7 +526,7 @@ void AES::aes_encrypt(const BYTE in[], BYTE out[], const WORD key[], int keysize
 	out[15] = state[3][3];
 }
 
-void AES::aes_decrypt(const BYTE in[], BYTE out[], const WORD key[], int keysize)
+void AES::aes_decrypt(const BYTE in[], BYTE out[], const aesWORD key[], int keysize)
 {
 	BYTE state[4][4];
 
@@ -593,4 +593,87 @@ void AES::aes_decrypt(const BYTE in[], BYTE out[], const WORD key[], int keysize
 	out[13] = state[1][3];
 	out[14] = state[2][3];
 	out[15] = state[3][3];
+}
+void AES::aes_encrypt(std::string SecretData, std::string key)
+{
+	SHA256 *sha256 = new SHA256();
+
+	unsigned int key_schedule[60];
+	BYTE enc_buf[128];
+	BYTE dec_buf[128];
+	BYTE plaintext[32];
+	BYTE initialValue[16] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f };
+	aes_key_setup(sha256->sha256_abbreviation(key), key_schedule, 256);
+
+	int secretDataLength = SecretData.length()+1;
+	BYTE *ByteSecretData = new BYTE[secretDataLength];
+	memcpy(ByteSecretData, SecretData.data(), secretDataLength);
+
+	int secDataPointer = SecretData.length();
+
+	FILE *file = NULL;
+	fopen_s(&file, "config.bin", "wb");
+	if (file != NULL)
+	{
+		int packetNo = 0;
+		while (secDataPointer > 0)
+		{
+			memcpy(plaintext, ByteSecretData + packetNo * 32, 32);
+			
+			if (aes_encrypt_cbc(plaintext, 32, enc_buf, key_schedule, 256, initialValue) == false)
+			{
+				fclose(file);
+				printf("Something went wrong with encryption!");
+				return;
+			}
+			fwrite(&enc_buf, 1, 32, file);
+			packetNo++;
+			secDataPointer -= 32;
+		}
+	}
+	else
+	{
+		std::cout << "config.bin is corrupted!" << std::endl;
+		fclose(file);
+	}
+	
+	fclose(file);
+	//aes_decrypt(key);
+	delete sha256;
+}
+std::string AES::aes_decrypt(std::string key)
+{
+	SHA256 *sha256 = new SHA256();
+	unsigned int key_schedule[60];
+	BYTE enc_buf[128];
+	BYTE dec_buf[128];
+	BYTE initialValue[16] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f }; //initial value
+	aes_key_setup(sha256->sha256_abbreviation(key), key_schedule, 256);
+
+	BYTE *data = Utilities::ReadFromBinFile("config.bin");
+	int dataPointer = Utilities::BinFileElementsNo("config.bin");
+	std::string plaintext = "";
+	std::string plaintextTemp="";
+
+	if (data != NULL)
+	{
+		int packetNo = 0;
+		while (dataPointer > 0)
+		{
+			memcpy(enc_buf, data + packetNo * 32, 32);
+			aes_decrypt_cbc(enc_buf, 32, dec_buf, key_schedule, 256, initialValue);
+			std::string plaintextTemp((char *)dec_buf);
+			plaintext += plaintextTemp.substr(0,32);
+			packetNo++;
+			dataPointer -= 32;
+		}
+	}
+	else
+	{
+		std::cout << "config.bin is empty!" << std::endl;
+	}
+
+	delete sha256;
+
+	return plaintext;
 }

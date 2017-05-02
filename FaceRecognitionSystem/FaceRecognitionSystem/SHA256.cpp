@@ -11,7 +11,7 @@ SHA256::~SHA256()
 
 void SHA256::sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 {
-	WORD a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+	 sha256WORD a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
 		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
@@ -66,7 +66,7 @@ void SHA256::sha256_init(SHA256_CTX *ctx)
 
 void SHA256::sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
 {
-	WORD i;
+	 sha256WORD i;
 
 	for (i = 0; i < len; ++i) {
 		ctx->data[ctx->datalen] = data[i];
@@ -81,7 +81,7 @@ void SHA256::sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
 
 void SHA256::sha256_final(SHA256_CTX *ctx, BYTE hash[])
 {
-	WORD i;
+	 sha256WORD i;
 
 	i = ctx->datalen;
 
@@ -123,4 +123,19 @@ void SHA256::sha256_final(SHA256_CTX *ctx, BYTE hash[])
 		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
 	}
+}
+BYTE* SHA256::sha256_abbreviation(std::string key)
+{
+	BYTE *keyBuf = new BYTE[key.length()+1];
+	memcpy(keyBuf, key.c_str(), key.length() + 1);
+
+	BYTE buf[SHA256_BLOCK_SIZE];
+	SHA256_CTX ctx;
+	SHA256 *sha256 = new SHA256();
+	sha256->sha256_init(&ctx);
+	sha256->sha256_update(&ctx, keyBuf, sizeof(keyBuf) - 1);
+	sha256->sha256_final(&ctx, buf);
+
+	delete [] keyBuf;
+	return buf;
 }

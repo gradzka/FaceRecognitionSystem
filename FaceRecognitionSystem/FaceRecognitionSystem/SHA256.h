@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <string>
 
 #define SHA256_BLOCK_SIZE 32            // SHA256 outputs a 32 byte digest
 
@@ -15,18 +16,18 @@
 #define SIG1(x) (ROTRIGHT(x,17) ^ ROTRIGHT(x,19) ^ ((x) >> 10))
 
 typedef unsigned char BYTE;             // 8-bit byte
-typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-bit machines
+typedef unsigned int  sha256WORD;             // 32-bit word, change to "long" for 16-bit machines
 
 typedef struct {
 	BYTE data[64];
-	WORD datalen;
+	sha256WORD datalen;
 	unsigned long long bitlen;
-	WORD state[8];
+	 sha256WORD  state[8];
 } SHA256_CTX;
 
 class SHA256
 {
-	const WORD k[64] = {
+	const sha256WORD k[64] = {
 		0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
 		0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
 		0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
@@ -43,4 +44,5 @@ public:
 	void sha256_init(SHA256_CTX *ctx);
 	void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len);
 	void sha256_final(SHA256_CTX *ctx, BYTE hash[]);
+	BYTE* sha256_abbreviation(std::string key);
 };

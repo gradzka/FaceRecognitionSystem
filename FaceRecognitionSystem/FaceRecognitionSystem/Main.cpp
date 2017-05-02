@@ -1,6 +1,6 @@
 #include "Camera.h"
-#include "DES.h"
 #include <regex>
+#include "AES.h"
 
 bool checkKeyboard(Camera *camera, int key)
 {
@@ -74,10 +74,27 @@ Camera* cameraConfiguration()
 		}
 		case 2:
 		{
-			camera = new Camera("", "");
-			DES * des = new DES();
-			des->EncryptDecrypt(false);
-			des->readEncryptedData(camera);
+			AES *aes = new AES();
+
+			std::string key = "";
+			std::cout << "Type key" << std::endl;
+			Utilities::maskPassword(key);
+
+			std::string secretData = aes->aes_decrypt(key);
+			//secretData = camera->getIPaddress() + "," + camera->getUSERPWD();
+			//sep[0] camera->getIPaddress()
+			//sep[1] camera->getUSERPWD()
+			std::vector<std::string> sep = Utilities::split(secretData, ',');
+			if (sep.size() == 2)
+			{
+				camera = new Camera(sep[0], sep[1]);
+			}
+			else
+			{
+				std::cout << "Config file is missed or corrupted!\n\n";
+				camera = NULL;
+			}
+
 			if (camera!=NULL)
 			{
 				camera->testConnection(camera);
@@ -89,10 +106,13 @@ Camera* cameraConfiguration()
 			camera = camera->typeCameraData();
 			if (camera != NULL)
 			{
-				DES *des = new DES();
-				std::string SecretData = camera->getIPaddress() + "," + camera->getUSERPWD();
-				des->EncryptDecrypt(true, SecretData);
-				std::cout << "Your data was encrypted with DES algorithm and saved in config.bin" << std::endl;
+				AES *aes = new AES();
+				std::string secretData = camera->getIPaddress() + "," + camera->getUSERPWD();
+				std::cout << "Type key" << std::endl;
+				std::string password = "";
+				Utilities::maskPassword(password);
+				aes->aes_encrypt(secretData, password);
+				std::cout << "Your data was encrypted with AES algorithm and saved in config.bin" << std::endl;
 			}
 			break;
 		}
@@ -115,7 +135,7 @@ int main(int argc, char *argv[])
 
 	do
 	{
-		camera = cameraConfiguration(); //TODO
+		camera = cameraConfiguration();
 	} while (camera == NULL);
 
 	//Camera * camera = new Camera("IP","login:password");
