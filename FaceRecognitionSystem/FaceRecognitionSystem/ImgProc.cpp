@@ -39,6 +39,7 @@ int ImgProc::detectFace(cv::Mat img)
 		rectangle(img, rect_face, cv::Scalar(120, 5, 86), 2, 2, 0);
 	}*/
 	//imshow(window_name, img);
+
 	return faces.size();
 }
 

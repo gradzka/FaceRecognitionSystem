@@ -1,5 +1,5 @@
 #pragma once
-#include "libcurl/include/curl/curl.h"
+
 #include "string"
 #include <filesystem>
 #include "opencv2\highgui\highgui.hpp"
@@ -9,10 +9,13 @@
 #include "Utilities.h"
 #include "ImgProc.h"
 
+#define CURL_STATICLIB
+#include "curl/curl.h"
+
 #ifdef _DEBUG
-#pragma comment(lib, "libcurl/lib/libcurl_a_debug.lib")
+#pragma comment(lib, "curl/libcurl_a_debug.lib")
 #else
-#pragma comment(lib, "libcurl/lib/libcurl_a.lib")
+#pragma comment(lib, "curl/libcurl.a_lib")
 #endif
 
 #define VK_HOME			0x48
