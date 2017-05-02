@@ -15,7 +15,7 @@
 #ifdef _DEBUG
 #pragma comment(lib, "curl/libcurl_a_debug.lib")
 #else
-#pragma comment(lib, "curl/libcurl.a_lib")
+#pragma comment(lib, "curl/libcurl_a.lib")
 #endif
 
 #define VK_HOME			0x48

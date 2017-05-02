@@ -16,8 +16,7 @@ $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerEnvironment>PATH=opencv\x86\vc15\bin;$(PATH)
-PATH=opencv\x86\vc12\bin;$(PATH)</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=opencv\x86\vc14\bin;$(PATH)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
