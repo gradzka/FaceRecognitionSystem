@@ -46,7 +46,7 @@ int ImgProc::detectFace(cv::Mat img)
 bool ImgProc::createCSV()
 {
 	std::fstream file;
-	file.open("corp.txt", std::ios::out);
+	file.open("corp.csv", std::ios::out);
 	if (file.good() != true)
 	{
 		std::cout << "Error!" << std::endl;
@@ -101,4 +101,28 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	}
 	std::cout << "HELP - C" << std::endl;
 	std::cout << "Type: ";
+}
+void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & images, std::vector<int> & labels)
+{
+	std::ifstream file(filename.c_str(), std::ifstream::in);
+	if (!file)
+	{
+		std::cout << "Open " << filename << " file failed.";
+		return;
+	}
+	std::string line, path, classlabel;
+	while (getline(file, line))
+	{
+		std::stringstream liness(line);
+		getline(liness, path, ';');
+		getline(liness, classlabel);
+		//classlabel.erase(0, 1);
+		//path.erase(path.length() - 1, path.length());
+		if (!path.empty() && !classlabel.empty())
+		{
+			images.push_back(cv::imread(path, 0));
+			labels.push_back(atoi(classlabel.c_str()));
+			//std::cout << path << "=" << atoi(classlabel.c_str()) << std::endl;
+		}
+	}
 }

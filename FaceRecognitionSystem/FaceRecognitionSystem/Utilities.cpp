@@ -22,6 +22,8 @@ void Utilities::printCommandList()
 	std::cout << "H\tMove the camera to home position" << std::endl;;
 	std::cout << "P\tTake pictures" << std::endl;
 	std::cout << "A\tCount people" << std::endl;
+	std::cout << "T\tTrain face recognizer" << std::endl;
+	std::cout << "R\tStart face recognizer" << std::endl;
 	std::cout << "C\tShow command list" << std::endl;
 	std::cout << "ESC\tExit the application" << std::endl;
 	std::cout << "Type: ";

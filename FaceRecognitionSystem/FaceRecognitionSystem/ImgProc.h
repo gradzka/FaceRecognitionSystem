@@ -19,5 +19,7 @@ public:
 	~ImgProc();
 	bool createCSV();
 	void countPeople(std::string userPwd, std::string addressIP);
+	void read_csv(const std::string & filename, std::vector<cv::Mat> & images, std::vector<int> & labels);
+
 };
 

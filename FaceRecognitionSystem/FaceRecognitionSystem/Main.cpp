@@ -29,7 +29,9 @@ void t_keyboard(Camera *camera)
 		checkKeyboard(camera, VK_HOME);			//home posiotion (H)
 		checkKeyboard(camera, VK_PICTURE);		//take picture (P)
 		checkKeyboard(camera, VK_COMMAND);		//command list (C)
-		checkKeyboard(camera, VK_ATTENDANCE);	//command list (A)
+		checkKeyboard(camera, VK_ATTENDANCE);	//count people (A)
+		checkKeyboard(camera, VK_TRAIN_FR);		//train FaceRecognizer (T)
+		checkKeyboard(camera, VK_FR);			//Recognize face (R)
 		state=checkKeyboard(camera, VK_ESCAPE);	//exit
 	}
 }
