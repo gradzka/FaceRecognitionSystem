@@ -20,7 +20,7 @@ int ImgProc::detectFace(cv::Mat img)
 
 	cvtColor(img, img_gray, CV_BGR2GRAY);
 	cv::equalizeHist(img_gray, img_gray);
-	const int scale = 2;
+	//const int scale = 2;
 
 	face_cascade.detectMultiScale(img_gray, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
 	/*int percentheigth = 0;
@@ -97,7 +97,7 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	}
 	else
 	{
-		std::cout << "Haarcascade_frontalface_alt.xml not found." << std::endl;
+		std::cout << face_cascade_name + " not found." << std::endl;
 	}
 	std::cout << "HELP - C" << std::endl;
 	std::cout << "Type: ";
@@ -125,4 +125,59 @@ void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & imag
 			//std::cout << path << "=" << atoi(classlabel.c_str()) << std::endl;
 		}
 	}
+}
+void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
+{
+	if (model->getLabelInfo(0)=="")
+	{
+		std::cout << "Error! Model is not trained!" << std::endl;
+		return;
+	}
+	std::cout << std::endl << "wait..." << std::endl;
+	cv::VideoCapture vcap;
+	cv::Mat image;
+	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch1";
+
+	if (!vcap.open(videoStreamAdress))
+	{
+		std::cout << "Error opening video stream or file." << std::endl;
+		return;
+	}
+	if (face_cascade.load(face_cascade_name))
+	{
+		std::vector<cv::Rect> faces;
+		cv::Mat img_gray;
+		cv::Mat img_resized;
+		cv::Mat img_cut;
+		cv::namedWindow("Sample", CV_WINDOW_AUTOSIZE);
+		cv::namedWindow("Predicted", CV_WINDOW_AUTOSIZE);
+		int plabel=-1;
+		double predicted_confidence = 0.0;
+		while(true)
+		{
+			if (vcap.read(image))
+			{
+				cvtColor(image, img_gray, CV_BGR2GRAY);
+				cv::equalizeHist(img_gray, img_gray);
+
+				face_cascade.detectMultiScale(img_gray, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+				for (unsigned i = 0; i < faces.size(); i++)
+				{
+					img_cut = image(faces[i]);
+					resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
+					model->predict(img_gray, plabel, predicted_confidence);
+					std::cout << plabel;
+					std::cout << "Predicted person: " << plabel << " with confidence: " << predicted_confidence<< "." << std::endl;
+				}
+				cv::waitKey(1);
+			}
+		}
+		std::cout << std::endl;
+
+	}
+	else
+	{
+		std::cout << face_cascade_name + " not found." << std::endl;
+	}
+
 }

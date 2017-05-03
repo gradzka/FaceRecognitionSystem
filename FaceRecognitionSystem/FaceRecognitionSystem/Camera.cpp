@@ -131,37 +131,20 @@ void Camera::sendMessage(int command)
 			{
 				std::cout << std::endl<< "wait..." << std::endl;
 				imgproc->createCSV();
-				std::vector<cv::Mat> images;
-				std::vector<int> labels;
-				imgproc->read_csv("corp.csv", images, labels);
-				cv::Ptr<cv::FaceRecognizer> model = cv::createEigenFaceRecognizer();
-				model->train(images, labels);
+
+				imgproc->read_csv("corp.csv", imgproc->images, imgproc->labels);
+				imgproc->model = cv::createEigenFaceRecognizer();
+				imgproc->model->train(imgproc->images, imgproc->labels);
 				//model->save("TUTAJ.txt"); -TODO
 
-				/*cv::Mat test = cv::imread("test3.pgm", 0); //0 -gray picture, >0 BGR format
-				if (!test.data)
-				{
-					std::cout << "There's no test3.pgm" << std::endl;
-					return;
-				}
-				cv::namedWindow("Sample", CV_WINDOW_AUTOSIZE);
-				cv::namedWindow("Predicted", CV_WINDOW_AUTOSIZE);
-				int plabel = model->predict(test);
-				std::cout << plabel;
-				cv::imshow("Sample", test);
-				int i = 0;
-				cv::imshow("Predicted", images[5 * plabel + (i % 5)]);
-				while (cv::waitKey(0) != 27)
-				{
-					i++;
-					cv::imshow("Predicted", images[5 * plabel + (i % 5)]);
-				}*/
+				
 				std::cout << "Face recognizer has trained successfully!" << std::endl;
 				std::cout << "Type:";
 				return;
 			}
 			case VK_FR: //rozpocznij rozpoznawanie twarzy (R)
 			{
+				imgproc->predictPerson(this->USERPWD, this->IPAddress);
 				return;
 			}
 			case 0: //zatrzymaj kamere

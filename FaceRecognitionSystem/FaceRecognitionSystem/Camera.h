@@ -2,11 +2,7 @@
 
 #include "string"
 #include <filesystem>
-#include "opencv2\highgui\highgui.hpp"
 #include "opencv2\core\core.hpp"
-#include "opencv2\contrib\contrib.hpp"
-#include "opencv2\imgproc\imgproc.hpp"
-#include "opencv2\objdetect\objdetect.hpp"
 #include <ctime>
 #include <iostream>
 #include <thread>
