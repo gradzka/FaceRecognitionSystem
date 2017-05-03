@@ -36,7 +36,7 @@ double Camera::getFPS()
 	vcap.release();
 	return num_frames / seconds;
 }
-void Camera::captureFrame()
+void Camera::CaptureFrame()
 {
 	std::string dirName;
 	std::cout << std::endl;
@@ -71,6 +71,13 @@ void Camera::captureFrame()
 		Beep(1568, 1000);
 		cv::VideoCapture vcap;
 		cv::Mat image;
+
+		std::vector<cv::Rect> faces;
+		cv::Mat img_gray;                                 
+		cv::Mat img_cut;
+		cv::Mat img_resized;
+		cv::Mat resized_gray;
+
 		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
 
 		if (!vcap.open(videoStreamAdress))
@@ -155,6 +162,7 @@ void Camera::CaptureFrameToCorp()
 		Beep(1568, 1000);
 		cv::VideoCapture vcap;
 		cv::Mat image;
+		cv::Mat croppedImage;
 		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
 
 		if (!vcap.open(videoStreamAdress))
@@ -174,13 +182,18 @@ void Camera::CaptureFrameToCorp()
 				{
 					if (frameID % (int)fps*frequency == 0 && frameID != 0)
 					{
-						Beep(1568, 200);
-						FileNameS = "screenshots/" + dirName + "/";
-						FileNameS += std::string(FileName);
-						FileNameS += ".png";
 						//przytnij
-						cv::imwrite(FileNameS, image);
-						numberOfPictures--;
+						croppedImage=imgproc->cropFace(image);
+						if (croppedImage.channels() != image.channels())
+						{
+							Beep(1568, 200);
+							FileNameS = "screenshots/" + dirName + "/";
+							FileNameS += std::string(FileName);
+							FileNameS += ".png";
+
+							cv::imwrite(FileNameS, croppedImage);
+							numberOfPictures--;
+						}
 					}
 				}
 				else
@@ -246,7 +259,7 @@ void Camera::sendMessage(int command)
 			}
 			case VK_PICTURE: //zdjecie (P)
 			{
-				captureFrame();				
+				CaptureFrameToCorp();				
 				return;
 			}
 			case VK_ATTENDANCE: //zlicz liczbe osob (A)

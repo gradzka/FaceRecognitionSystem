@@ -17,6 +17,7 @@ class ImgProc
 	cv::CascadeClassifier face_cascade;        
 	std::string window_name;
 	int detectFace(cv::Mat img);
+	bool isModelTrained;
 public:
 	cv::Ptr<cv::FaceRecognizer> model;
 	std::vector<cv::Mat> images;
@@ -28,5 +29,6 @@ public:
 	void read_csv(const std::string & filename, std::vector<cv::Mat> & images, std::vector<int> & labels);
 	void ImgProc::TrainFaceRecognizer();
 	void predictPerson(std::string userPwd, std::string addressIP);
+	cv::Mat cropFace(cv::Mat img);
 };
 

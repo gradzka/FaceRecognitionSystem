@@ -8,6 +8,7 @@ ImgProc::ImgProc()
 	face_cascade_name = "lbpcascade_frontalface.xml";
 	window_name = "Hello Face!";
 	model = cv::createEigenFaceRecognizer();
+	isModelTrained = false;
 }
 
 
@@ -76,7 +77,7 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	std::cout<<std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://"+userPwd+"@"+addressIP+":80/live/ch1";
+	const std::string videoStreamAdress = "rtsp://"+userPwd+"@"+addressIP+":80/live/ch0";
 
 	if (!vcap.open(videoStreamAdress))
 	{
@@ -100,6 +101,7 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	{
 		std::cout << face_cascade_name + " not found." << std::endl;
 	}
+	vcap.release();
 	std::cout << "HELP - C" << std::endl;
 	std::cout << "Type: ";
 }
@@ -144,6 +146,7 @@ void ImgProc::TrainFaceRecognizer()
 		{
 			std::cout << "wait..." << std::endl;
 			model->load("trainFR.xml");
+			isModelTrained = true;
 			std::cout << "Face recognizer training data load successfully!" << std::endl;
 			std::cout <<std::endl<< "HELP - C" << std::endl;
 			std::cout << "Type:";
@@ -156,7 +159,7 @@ void ImgProc::TrainFaceRecognizer()
 	read_csv("corp.csv", images, labels);
 	model->train(images, labels);
 	std::cout << "Face recognizer has trained successfully!" << std::endl;
-
+	isModelTrained = true;
 	std::cout << "Do you want to save training data in trainFR.xml file?: Yes[Y]/No[N]\n";
 	std::cin.ignore();
 	yesNo = (char)getchar();
@@ -176,7 +179,7 @@ void ImgProc::TrainFaceRecognizer()
 }
 void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 {
-	if (model->getLabelInfo(0)=="")
+	if (isModelTrained==false)
 	{
 		std::cout << "Error! Model is not trained!" << std::endl;
 		return;
@@ -184,7 +187,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	std::cout << std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch1";
+	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch0";
 
 	if (!vcap.open(videoStreamAdress))
 	{
@@ -195,32 +198,50 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	{
 		std::vector<cv::Rect> faces;
 		cv::Mat img_gray;
-		cv::Mat img_resized;
 		cv::Mat img_cut;
-		cv::namedWindow("Sample", CV_WINDOW_AUTOSIZE);
-		cv::namedWindow("Predicted", CV_WINDOW_AUTOSIZE);
+		cv::Mat img_resized;
+		cv::Mat resized_gray;
+		
 		int plabel=-1;
 		double predicted_confidence = 0.0;
-		while(true)
+		std::cout << "People recognition module has started..." << std::endl;
+		/*while(true)
 		{
 			if (vcap.read(image))
 			{
-				cvtColor(image, img_gray, CV_BGR2GRAY);
-				cv::equalizeHist(img_gray, img_gray);
-
-				face_cascade.detectMultiScale(img_gray, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+				face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+				std::cout << faces.size() << std::endl;
 				for (unsigned i = 0; i < faces.size(); i++)
 				{
-					img_cut = image(faces[i]);
+					cvtColor(image, img_gray, CV_BGR2GRAY);
+					img_cut = img_gray(faces[i]);
 					resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
-					model->predict(img_gray, plabel, predicted_confidence);
-					std::cout << plabel;
+					model->predict(img_cut, plabel, predicted_confidence);
 					std::cout << "Predicted person: " << plabel << " with confidence: " << predicted_confidence<< "." << std::endl;
 				}
 				cv::waitKey(1);
 			}
+		}*/
+		cv::namedWindow("Sample", CV_WINDOW_AUTOSIZE);
+		cv::namedWindow("Predicted", CV_WINDOW_AUTOSIZE);
+		cv::Mat test = cv::imread("test.png", 0);
+		if (!test.data)
+		{
+			std::cout << "Nie odnaleziono.";
+			return;
 		}
+		model->predict(test, plabel, predicted_confidence);
+		std::cout << "Predicted person: " << plabel << " with confidence: " << predicted_confidence << "." << std::endl;
+
 		std::cout << std::endl;
+		imshow("Sample", test);
+		int i = 0;
+		imshow("Predicted", images[5 * plabel + (i % 5)]);
+		while (cv::waitKey(0) != 27)
+		{
+			i++;
+			imshow("Predicted", images[5 * plabel + (i % 5)]);
+		}
 
 	}
 	else
@@ -228,4 +249,32 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		std::cout << face_cascade_name + " not found." << std::endl;
 	}
 
+}
+
+cv::Mat ImgProc::cropFace(cv::Mat img)
+{
+	if (face_cascade.load(face_cascade_name))
+	{
+		std::vector<cv::Rect> faces;
+		cv::Mat img_gray;
+		cv::Mat img_cut;
+		cv::Mat img_resized;
+		cv::Mat resized_gray;
+		cvtColor(img, img_gray, CV_BGR2GRAY);
+
+		face_cascade.detectMultiScale(img, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+		if (faces.size() != 1)
+		{
+			return img;
+		}
+		img_cut = img(faces[0]);
+		resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
+		cvtColor(img_resized, resized_gray, CV_BGR2GRAY);
+		return resized_gray;
+	}
+	else
+	{
+		std::cout << face_cascade_name + " not found." << std::endl;
+		return img;
+	}
 }
