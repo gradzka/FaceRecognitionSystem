@@ -11,6 +11,31 @@ Camera::~Camera()
 {
 }
 
+double Camera::getFPS()
+{
+	std::cout << "Configuration of IP camera settings. Wait..." << std::endl;
+	cv::VideoCapture vcap;
+	cv::Mat image;
+	const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch1";
+
+	if (!vcap.open(videoStreamAdress))
+	{
+		std::cout << "Error opening video stream or file" << std::endl;
+		return 0;
+	}
+	int num_frames = 100;
+	time_t start, end;
+	time(&start);
+	for (size_t i = 0; i < num_frames; i++)
+	{
+		vcap >> image;
+	}
+	time(&end);
+
+	double seconds=difftime(end, start);
+	vcap.release();
+	return num_frames / seconds;
+}
 void Camera::captureFrame()
 {
 	std::string dirName;
@@ -19,7 +44,7 @@ void Camera::captureFrame()
 
 	//Utilities::cleanBuffer();
 	
-	std::getline(std::cin, dirName);	
+	std::getline(std::cin, dirName);
 	std::cout << "Type number of pictures that will be made:" << std::endl;
 	int numberOfPictures = 0;
 	std::cin >> numberOfPictures;
@@ -30,6 +55,20 @@ void Camera::captureFrame()
 		//create folder, where images will be stored
 		std::experimental::filesystem::create_directory("screenshots/" + dirName);
 
+		double fps = getFPS(); //number of frame per second
+		if (fps == 0) {
+			std::cout << "Error opening video stream" << std::endl;
+			return;
+		}
+
+		std::time_t time;
+		char FileName[20];
+		std::string FileNameS;
+		struct tm timeinfo;
+
+		int frameID = 0;
+		int frequency = 3;
+		Beep(1568, 1000);
 		cv::VideoCapture vcap;
 		cv::Mat image;
 		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
@@ -39,43 +78,131 @@ void Camera::captureFrame()
 			std::cout << "Error opening video stream or file" << std::endl;
 			return;
 		}
-
-		std::time_t time;
-		char FileName[20];
-		std::string FileNameS;
-		struct tm timeinfo;
-
+		
 		do {
+			frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
 			time = std::time(NULL);
 			localtime_s(&timeinfo, &time);
 			if (std::strftime(FileName, sizeof(FileName), "%F %H-%M-%S", &timeinfo))
 			{
 				if (vcap.read(image))
 				{
-					FileNameS = "screenshots/" + dirName + "/";
-					FileNameS += std::string(FileName);
-					FileNameS += ".png";
-					cv::imwrite(FileNameS, image);
+					if (frameID % (int)fps*frequency == 0 && frameID!=0)
+					{
+						Beep(1568, 200);
+						FileNameS = "screenshots/" + dirName + "/";
+						FileNameS += std::string(FileName);
+						FileNameS += ".png";
+						cv::imwrite(FileNameS, image);
+						numberOfPictures--;						
+					}				
 				}
 				else
 				{
 					std::cout << "No frame captured!" << std::endl;
 					return;
-				}
-				numberOfPictures--;
+				}			
 			}
 			else
 			{
 				std::cout << "Problem with file creation!" << std::endl;
 				return;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			
+			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));		
 		} while (numberOfPictures > 0);
+		Beep(1568, 1000);
 		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;	
 	}
 	else
 	{
 		std::cout << "Error! No screenshots were taken."<<std::endl;
+	}
+	std::cout << "Type:";
+}
+void Camera::CaptureFrameToCorp()
+{
+	std::string dirName;
+	std::cout << std::endl;
+	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
+
+	//Utilities::cleanBuffer();
+
+	std::getline(std::cin, dirName);
+	std::cout << "Type number of pictures that will be made:" << std::endl;
+	int numberOfPictures = 0;
+	std::cin >> numberOfPictures;
+	std::cout << "wait..." << std::endl;
+
+	if (numberOfPictures > 0) {
+		std::experimental::filesystem::create_directory("screenshots/");
+		//create folder, where images will be stored
+		std::experimental::filesystem::create_directory("screenshots/" + dirName);
+
+		double fps = getFPS(); //number of frame per second
+		if (fps == 0) {
+			std::cout << "Error opening video stream" << std::endl;
+			return;
+		}
+
+		std::time_t time;
+		char FileName[20];
+		std::string FileNameS;
+		struct tm timeinfo;
+
+		int frameID = 0;
+		int frequency = 3;
+		Beep(1568, 1000);
+		cv::VideoCapture vcap;
+		cv::Mat image;
+		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
+
+		if (!vcap.open(videoStreamAdress))
+		{
+			std::cout << "Error opening video stream or file" << std::endl;
+			return;
+		}
+		//vcap.set(CV_CAP_PROP_FPS, fps);	
+
+		do {
+			frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
+			time = std::time(NULL);
+			localtime_s(&timeinfo, &time);
+			if (std::strftime(FileName, sizeof(FileName), "%F %H-%M-%S", &timeinfo))
+			{
+				if (vcap.read(image))
+				{
+					if (frameID % (int)fps*frequency == 0 && frameID != 0)
+					{
+						Beep(1568, 200);
+						FileNameS = "screenshots/" + dirName + "/";
+						FileNameS += std::string(FileName);
+						FileNameS += ".png";
+						//przytnij
+						cv::imwrite(FileNameS, image);
+						numberOfPictures--;
+					}
+				}
+				else
+				{
+					std::cout << "No frame captured!" << std::endl;
+					return;
+				}
+			}
+			else
+			{
+				std::cout << "Problem with file creation!" << std::endl;
+				return;
+			}
+
+			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));		
+		} while (numberOfPictures > 0);
+		Beep(1568, 1000);
+		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;
+	}
+	else
+	{
+		std::cout << "Error! No screenshots were taken." << std::endl;
 	}
 	std::cout << "Type:";
 }
@@ -129,17 +256,7 @@ void Camera::sendMessage(int command)
 			}
 			case VK_TRAIN_FR: //trenuj FaceRecognizer (T)
 			{
-				std::cout << std::endl<< "wait..." << std::endl;
-				imgproc->createCSV();
-
-				imgproc->read_csv("corp.csv", imgproc->images, imgproc->labels);
-				imgproc->model = cv::createEigenFaceRecognizer();
-				imgproc->model->train(imgproc->images, imgproc->labels);
-				//model->save("TUTAJ.txt"); -TODO
-
-				
-				std::cout << "Face recognizer has trained successfully!" << std::endl;
-				std::cout << "Type:";
+				imgproc->TrainFaceRecognizer();
 				return;
 			}
 			case VK_FR: //rozpocznij rozpoznawanie twarzy (R)

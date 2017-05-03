@@ -8,6 +8,8 @@
 #include <iostream> 
 #include <filesystem>
 #include <fstream>
+#include <conio.h>
+#include "Utilities.h"
 
 class ImgProc
 {
@@ -24,6 +26,7 @@ public:
 	bool createCSV();
 	void countPeople(std::string userPwd, std::string addressIP);
 	void read_csv(const std::string & filename, std::vector<cv::Mat> & images, std::vector<int> & labels);
+	void ImgProc::TrainFaceRecognizer();
 	void predictPerson(std::string userPwd, std::string addressIP);
 };
 

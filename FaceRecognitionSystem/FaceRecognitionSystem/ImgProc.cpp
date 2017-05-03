@@ -7,6 +7,7 @@ ImgProc::ImgProc()
 	//face_cascade_name = "haarcascade_frontalface_alt.xml";
 	face_cascade_name = "lbpcascade_frontalface.xml";
 	window_name = "Hello Face!";
+	model = cv::createEigenFaceRecognizer();
 }
 
 
@@ -125,6 +126,53 @@ void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & imag
 			//std::cout << path << "=" << atoi(classlabel.c_str()) << std::endl;
 		}
 	}
+}
+void ImgProc::TrainFaceRecognizer()
+{
+	Utilities::cleanBuffer();
+	char yesNo;
+	if (std::experimental::filesystem::exists("trainFR.xml") && !std::experimental::filesystem::is_empty("trainFR.xml"))
+	{
+		std::cout << std::endl<< "Do you want to load training data from trainFR.xml file?: Yes[Y]/No[N]\n";
+		yesNo = (char)getchar();
+		while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
+		{
+			std::cout << "\nType: Yes[Y]/No[N]\n";
+			yesNo = (char)getchar();
+		}		
+		if (yesNo == 'Y' || yesNo == 'y')
+		{
+			std::cout << "wait..." << std::endl;
+			model->load("trainFR.xml");
+			std::cout << "Face recognizer training data load successfully!" << std::endl;
+			std::cout <<std::endl<< "HELP - C" << std::endl;
+			std::cout << "Type:";
+			return;
+		}
+	}
+
+	std::cout << "wait..." << std::endl;
+	createCSV();
+	read_csv("corp.csv", images, labels);
+	model->train(images, labels);
+	std::cout << "Face recognizer has trained successfully!" << std::endl;
+
+	std::cout << "Do you want to save training data in trainFR.xml file?: Yes[Y]/No[N]\n";
+	std::cin.ignore();
+	yesNo = (char)getchar();
+	while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
+	{
+		std::cout << "\nType: Yes[Y]/No[N]\n";
+		yesNo = (char)getchar();
+	}
+	if (yesNo == 'Y' || yesNo == 'y')
+	{
+		std::cout << std::endl << "wait..." << std::endl;
+		model->save("trainFR.xml");
+		std::cout << "Training data has saved successfully!" << std::endl;
+	}
+	std::cout << std::endl<< "HELP - C" << std::endl;
+	std::cout << "Type:";
 }
 void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 {
