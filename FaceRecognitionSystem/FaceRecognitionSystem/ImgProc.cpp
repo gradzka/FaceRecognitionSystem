@@ -146,6 +146,8 @@ void ImgProc::TrainFaceRecognizer()
 		{
 			std::cout << "wait..." << std::endl;
 			model->load("trainFR.xml");
+			createCSV();
+			read_csv("corp.csv", images, labels);
 			isModelTrained = true;
 			std::cout << "Face recognizer training data load successfully!" << std::endl;
 			std::cout <<std::endl<< "HELP - C" << std::endl;
@@ -231,7 +233,9 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 			return;
 		}
 		model->predict(test, plabel, predicted_confidence);
-		std::cout << "Predicted person: " << plabel << " with confidence: " << predicted_confidence << "." << std::endl;
+		std::cout << "Predicted person: " << plabel << 
+			//" with confidence: " << predicted_confidence <<
+			"." << std::endl;
 
 		std::cout << std::endl;
 		imshow("Sample", test);

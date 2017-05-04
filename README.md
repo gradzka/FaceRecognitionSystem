@@ -16,7 +16,7 @@ Project is based on simple console interface used to manipulate IP camera and st
 - [x] corps preparation,
 - [x] face detection,
 - [x] count people,
-- [ ] start learning algorithm,
+- [X] start learning algorithm,
 - [ ] program modes,
 - [ ] face recognition,
 - [ ] save results in log file,
@@ -37,11 +37,10 @@ Microsoft Visual Studio 2017
 * http://stackoverflow.com/a/106223
 * http://stackoverflow.com/questions/3572397/lib-curl-in-c-disable-printing
 * http://codingstreet.com/c-code-to-hide-input-password/
-* https://github.com/mimoo/DES
-* http://stackoverflow.com/questions/18937892/c-string-to-binary-code-binary-code-to-string
-* https://codereview.stackexchange.com/questions/25381/decimal-binary-hex-converter
-* http://stackoverflow.com/questions/23344257/convert-a-string-of-binary-into-an-ascii-string-c
+* https://github.com/B-Con/crypto-algorithms
 * http://stackoverflow.com/questions/236129/split-a-string-in-c
+* http://forbot.pl/blog/artykuly/programowanie/opencv-3-detekcja-i-rozpoznawanie-twarzy-id5664
+* https://www.learnopencv.com/how-to-find-frame-rate-or-frames-per-second-fps-in-opencv-python-cpp/
 
 ## License
 MIT
