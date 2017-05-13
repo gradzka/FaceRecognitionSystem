@@ -10,9 +10,11 @@
 #include <fstream>
 #include <conio.h>
 #include "Utilities.h"
-
+#include <map>
 class ImgProc
 {
+	std::map <int, std::string> peopleBase; //people from picture base in /screenshots/... <label, folder name>
+	std::map <int, std::string> predictedPeople; //people predicted by algorithm
 	std::string face_cascade_name;
 	cv::CascadeClassifier face_cascade;        
 	std::string window_name;

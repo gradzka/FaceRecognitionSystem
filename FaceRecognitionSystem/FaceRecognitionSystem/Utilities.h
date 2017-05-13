@@ -14,6 +14,7 @@ public:
 	Utilities();
 	~Utilities();
 	static void printCommandList();
+	static void dashes();
 	static void cleanBuffer();
 	static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp);
 	static void maskPassword(std::string &password);

@@ -14,19 +14,25 @@ Utilities::~Utilities()
 void Utilities::printCommandList()
 {
 	std::cout << std::endl;
-	std::cout << "BUTTON\tDescription" << std::endl;
-	std::cout << "UP\tMove the camera up" << std::endl;
-	std::cout << "DOWN\tMove the camera down" << std::endl;
-	std::cout << "LEFT\tMove the camera left" << std::endl;
-	std::cout << "RIGHT\tMove the camera right" << std::endl;
-	std::cout << "H\tMove the camera to home position" << std::endl;;
-	std::cout << "P\tTake pictures" << std::endl;
-	std::cout << "A\tCount people" << std::endl;
-	std::cout << "T\tTrain face recognizer" << std::endl;
-	std::cout << "R\tStart face recognizer" << std::endl;
-	std::cout << "C\tShow command list" << std::endl;
-	std::cout << "ESC\tExit the application" << std::endl;
+	Utilities::dashes();
+	std::cout << "<BUTTON>\t<Description>" << std::endl;
+	std::cout << "UP\t\tMove the camera up" << std::endl;
+	std::cout << "DOWN\t\tMove the camera down" << std::endl;
+	std::cout << "LEFT\t\tMove the camera left" << std::endl;
+	std::cout << "RIGHT\t\tMove the camera right" << std::endl;
+	std::cout << "H\t\tMove the camera to home position" << std::endl;;
+	std::cout << "P\t\tTake pictures" << std::endl;
+	std::cout << "A\t\tCount people" << std::endl;
+	std::cout << "T\t\tTrain face recognizer" << std::endl;
+	std::cout << "R\t\tStart face recognizer" << std::endl;
+	std::cout << "C\t\tShow command list" << std::endl;
+	std::cout << "ESC\t\tExit the application" << std::endl;
+	Utilities::dashes();
 	std::cout << "Type: ";
+}
+void Utilities::dashes()
+{
+	std::cout << "------------------------------------------------------------------" << std::endl;
 }
 void Utilities::cleanBuffer()
 {
@@ -64,6 +70,7 @@ void Utilities::maskPassword(std::string &password)
 		}
 	}
 	std::cout << std::endl;
+	dashes();
 }
 
 std::vector<std::string> Utilities::split(std::string str, char delimeter)
@@ -155,5 +162,6 @@ int Utilities::BinFileElementsNo(std::string fileName)
 	fclose(file);
 	return lSize;
 }
+
 
 

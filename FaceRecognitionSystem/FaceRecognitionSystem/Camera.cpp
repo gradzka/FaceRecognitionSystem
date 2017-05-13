@@ -163,7 +163,7 @@ void Camera::CaptureFrameToCorp()
 		cv::VideoCapture vcap;
 		cv::Mat image;
 		cv::Mat croppedImage;
-		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
+		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch1";
 
 		if (!vcap.open(videoStreamAdress))
 		{
@@ -219,7 +219,7 @@ void Camera::CaptureFrameToCorp()
 	}
 	std::cout << "Type:";
 }
-void Camera::sendMessage(int command)
+void Camera::sendMessage(char command)
 {
 	curl = curl_easy_init();
 	if (curl)
@@ -232,22 +232,22 @@ void Camera::sendMessage(int command)
 		std::string URL = "http://" + IPAddress+ "/hy-cgi/ptz.cgi?cmd=ptzctrl&act=";
 		switch (command)
 		{
-			case VK_UP: //gora
+			case VK_U: //gora
 			{
 				URL += "up";
 				break;
 			}
-			case VK_DOWN: //dol
+			case VK_D: //dol
 			{
 				URL += "down";
 				break;
 			}
-			case VK_LEFT: //lewo
+			case VK_L: //lewo
 			{
 				URL += "left";
 				break;
 			}
-			case VK_RIGHT: //prawo
+			case VK_R: //prawo
 			{
 				URL += "right";
 				break;
@@ -262,7 +262,7 @@ void Camera::sendMessage(int command)
 				CaptureFrameToCorp();				
 				return;
 			}
-			case VK_ATTENDANCE: //zlicz liczbe osob (A)
+			case VK_ESTIMATE: //zlicz liczbe osob (A)
 			{
 				imgproc->countPeople(this->USERPWD, this->IPAddress);
 				return;
@@ -326,17 +326,18 @@ bool Camera::testConnectionCurl()
 }
 void Camera::testConnection(Camera *& camera) 
 {
-	std::cout << "Test connection." << std::endl;
+	std::cout << "Test connection" << std::endl;
 	std::cout << "wait..." << std::endl;
 	if (camera->testConnectionCurl() == true)
 	{
-		std::cout << "Test connection succeeded." << std::endl << std::endl;
+		std::cout << "Test connection succeeded" << std::endl;
 	}
 	else
 	{
 		camera = NULL;
-		std::cout << "Test connection failed." << std::endl << std::endl;
+		std::cout << "Test connection failed" << std::endl;
 	}
+	Utilities::dashes();
 }
 Camera* Camera::typeCameraData()
 {
@@ -348,15 +349,17 @@ Camera* Camera::typeCameraData()
 	std::regex cameraIPpattern("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
 	do {
-		std::cout << "Type camera adress IP" << std::endl;
-		std::cout << "compatible with format: xxx.xxx.xxx.xxx" << std::endl;
+		std::cout << "Type camera adress IP compatible with format: xxx.xxx.xxx.xxx" << std::endl;
+		std::cout << "Type: ";
 		std::cin >> cameraIP;
+		Utilities::dashes();
 	} while (std::regex_match(cameraIP, cameraIPpattern) == false);
 
-	std::cout << "Type login" << std::endl;
+	std::cout << "Type login: ";
 	std::cin >> login;
+	Utilities::dashes();
 
-	std::cout << "Type password" << std::endl;
+	std::cout << "Type password: ";
 	Utilities::maskPassword(password);
 
 	loginPassword = login + ":" + password;

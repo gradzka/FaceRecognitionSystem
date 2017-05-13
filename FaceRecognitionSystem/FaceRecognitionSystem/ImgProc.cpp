@@ -1,5 +1,7 @@
 #include "ImgProc.h"
 
+#define crop_width 92
+#define crop_height 112
 
 
 ImgProc::ImgProc()
@@ -7,8 +9,10 @@ ImgProc::ImgProc()
 	//face_cascade_name = "haarcascade_frontalface_alt.xml";
 	face_cascade_name = "lbpcascade_frontalface.xml";
 	window_name = "Hello Face!";
-	model = cv::createEigenFaceRecognizer();
+	//model = cv::createLBPHFaceRecognizer();
+	model = cv::createFisherFaceRecognizer();
 	isModelTrained = false;
+	//model->set("threshold", 150.0);
 }
 
 
@@ -57,15 +61,18 @@ bool ImgProc::createCSV()
 
 	std::string path = "screenshots/";
 	int numberPerson = -1;
+	std::string folderName = "";
 	for (auto & p : std::experimental::filesystem::recursive_directory_iterator(path))
 	{
 		if (!std::experimental::filesystem::is_directory(p.path()))
 		{
 			file << p << ";" << numberPerson << std::endl;
+			
 		}
 		else
 		{
 			numberPerson++;
+			peopleBase[numberPerson] = p.path().string().substr(12, p.path().string().length()-12);
 		}
 	}
 	file.close();
@@ -77,7 +84,7 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	std::cout<<std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://"+userPwd+"@"+addressIP+":80/live/ch0";
+	const std::string videoStreamAdress = "rtsp://"+userPwd+"@"+addressIP+":80/live/ch1";
 
 	if (!vcap.open(videoStreamAdress))
 	{
@@ -198,9 +205,11 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		cv::Mat img_cut;
 		cv::Mat img_resized;
 		cv::Mat resized_gray;
-		
-		int plabel=-1;
+
+		int plabel = -1;
 		double predicted_confidence = 0.0;
+		int unrecogizedPeople = 0;
+		int positionInFile = 1;
 		if (!vcap.open(videoStreamAdress))
 		{
 			std::cout << "Error opening video stream or file." << std::endl;
@@ -208,60 +217,84 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		}
 		std::cout << "People recognition module has started..." << std::endl;
 		int frameID = -1;
-		while(true)
-		{
 
-			if (vcap.read(image))
+		//Create file with presences info
+		std::fstream pfile;
+		//file name
+		std::time_t time;
+		char date[20];
+		std::experimental::filesystem::create_directory("presence/");
+		std::string fileName = "presence/";
+		struct tm timeinfo;
+		time = std::time(NULL);
+		localtime_s(&timeinfo, &time);
+		if (std::strftime(date, sizeof(date), "%F %H-%M-%S", &timeinfo))
+		{
+			fileName += std::string(date)+".txt";
+			pfile.open(fileName, std::fstream::out);
+			if (pfile.is_open())
 			{
-				frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
-				if (frameID % 10 == 0 && frameID != 0)
+				while (true)
 				{
-					face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-					std::cout << faces.size() << std::endl;
-					for (unsigned i = 0; i < faces.size(); i++)
+					if (vcap.read(image))
 					{
-						cvtColor(image, img_gray, CV_BGR2GRAY);
-						img_cut = img_gray(faces[i]);
-						resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
-						model->predict(img_resized, plabel, predicted_confidence);
-						std::cout << "Predicted person: " << plabel <<
-							//" with confidence: " << predicted_confidence <<
-							"." << std::endl;
-						imshow("Sample", img_resized);
-						imshow("Predicted", images[5 * plabel + (i % 5)]);
+						frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
+						if (frameID % 10 == 0 && frameID != 0)
+						{
+							face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+							//std::cout << faces.size() << std::endl;
+							for (unsigned i = 0; i < faces.size(); i++)
+							{
+								cvtColor(image, img_gray, CV_BGR2GRAY);
+								img_cut = img_gray(faces[i]);
+								resize(img_cut, img_resized, cv::Size(crop_width, crop_height), 1.0, 1.0, cv::INTER_CUBIC);
+								model->predict(img_resized, plabel, predicted_confidence);
+								
+								if (plabel < 0)
+								{
+									std::cout << "Unrecognized person!"<< std::endl;
+									unrecogizedPeople++;
+								}
+								else if (predictedPeople.count(plabel) == 0)
+								{								
+									predictedPeople[plabel] = peopleBase[plabel];
+									pfile << positionInFile << "." << " " << predictedPeople[plabel] << std::endl;
+									positionInFile++;
+
+								}
+						
+								if (plabel > 0)
+								{
+									std::cout << "Predicted person: " << predictedPeople[plabel] <<
+										" with confidence: " << predicted_confidence <<
+										"." << std::endl;
+									//imshow("Sample", img_resized);
+									//imshow("Predicted", images[10 * plabel]);
+								}
+							}
+						}
+						cv::waitKey(1);
 					}
 				}
-				cv::waitKey(1);
+				pfile << unrecogizedPeople << " - " << "unrecognized people!" << std::endl;
+				pfile.close();
+			}
+			else
+			{
+				std::cout << face_cascade_name + " not found." << std::endl;
 			}
 		}
-
-		cv::Mat test = cv::imread("test.png", 0);
-		if (!test.data)
+		else
 		{
-			std::cout << "Nie odnaleziono.";
-			return;
-		}
-		model->predict(test, plabel, predicted_confidence);
-		std::cout << "Predicted person: " << plabel << 
-			//" with confidence: " << predicted_confidence <<
-			"." << std::endl;
-
-		std::cout << std::endl;
-		imshow("Sample", test);
-		int i = 0;
-		imshow("Predicted", images[5 * plabel + (i % 5)]);
-		while (cv::waitKey(0) != 27)
-		{
-			i++;
-			imshow("Predicted", images[5 * plabel + (i % 5)]);
+			std::cout << fileName << " is corrupted!" << std::endl;
+			pfile.close();
 		}
 
 	}
 	else
 	{
-		std::cout << face_cascade_name + " not found." << std::endl;
+		std::cout << "Creating presence file has been corrupted!" << ::std::endl;
 	}
-
 }
 
 cv::Mat ImgProc::cropFace(cv::Mat img)
@@ -281,7 +314,7 @@ cv::Mat ImgProc::cropFace(cv::Mat img)
 			return img;
 		}
 		img_cut = img(faces[0]);
-		resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
+		resize(img_cut, img_resized, cv::Size(crop_width, crop_height), 1.0, 1.0, cv::INTER_CUBIC);
 		cvtColor(img_resized, resized_gray, CV_BGR2GRAY);
 		return resized_gray;
 	}

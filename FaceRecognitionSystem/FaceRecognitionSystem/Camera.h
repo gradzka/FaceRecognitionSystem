@@ -18,12 +18,17 @@
 #pragma comment(lib, "curl/libcurl_a.lib")
 #endif
 
-#define VK_HOME			0x48
-#define VK_PICTURE		0x50
-#define VK_COMMAND		0x43
-#define VK_ATTENDANCE	0x41
-#define VK_TRAIN_FR		0x54
-#define VK_FR			0x52	
+#define VK_U			'w'
+#define VK_D			's'
+#define VK_L			'a'
+#define VK_R			'd'
+#define VK_HOME			'h'
+#define VK_PICTURE		'p'
+#define VK_COMMAND		'c'
+#define VK_ESTIMATE		'e'
+#define VK_TRAIN_FR		't'
+#define VK_FR			'r'
+#define VK_EXIT			'q'
 
 class Camera
 {
@@ -42,7 +47,7 @@ public:
 	void setUSERPWD(std::string UserPwd) { USERPWD = UserPwd; }
 	void CaptureFrame();
 	void CaptureFrameToCorp();
-	void sendMessage(int command);
+	void sendMessage(char command);
 	Camera* typeCameraData();
 	bool testConnectionCurl();
 	void testConnection(Camera *& camera);
