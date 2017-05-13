@@ -189,13 +189,8 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	std::cout << std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch0";
+	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch1";
 
-	if (!vcap.open(videoStreamAdress))
-	{
-		std::cout << "Error opening video stream or file." << std::endl;
-		return;
-	}
 	if (face_cascade.load(face_cascade_name))
 	{
 		std::vector<cv::Rect> faces;
@@ -206,26 +201,40 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		
 		int plabel=-1;
 		double predicted_confidence = 0.0;
-		std::cout << "People recognition module has started..." << std::endl;
-		/*while(true)
+		if (!vcap.open(videoStreamAdress))
 		{
+			std::cout << "Error opening video stream or file." << std::endl;
+			return;
+		}
+		std::cout << "People recognition module has started..." << std::endl;
+		int frameID = -1;
+		while(true)
+		{
+
 			if (vcap.read(image))
 			{
-				face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-				std::cout << faces.size() << std::endl;
-				for (unsigned i = 0; i < faces.size(); i++)
+				frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
+				if (frameID % 10 == 0 && frameID != 0)
 				{
-					cvtColor(image, img_gray, CV_BGR2GRAY);
-					img_cut = img_gray(faces[i]);
-					resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
-					model->predict(img_cut, plabel, predicted_confidence);
-					std::cout << "Predicted person: " << plabel << " with confidence: " << predicted_confidence<< "." << std::endl;
+					face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+					std::cout << faces.size() << std::endl;
+					for (unsigned i = 0; i < faces.size(); i++)
+					{
+						cvtColor(image, img_gray, CV_BGR2GRAY);
+						img_cut = img_gray(faces[i]);
+						resize(img_cut, img_resized, cv::Size(200, 200), 1.0, 1.0, cv::INTER_CUBIC);
+						model->predict(img_resized, plabel, predicted_confidence);
+						std::cout << "Predicted person: " << plabel <<
+							//" with confidence: " << predicted_confidence <<
+							"." << std::endl;
+						imshow("Sample", img_resized);
+						imshow("Predicted", images[5 * plabel + (i % 5)]);
+					}
 				}
 				cv::waitKey(1);
 			}
-		}*/
-		cv::namedWindow("Sample", CV_WINDOW_AUTOSIZE);
-		cv::namedWindow("Predicted", CV_WINDOW_AUTOSIZE);
+		}
+
 		cv::Mat test = cv::imread("test.png", 0);
 		if (!test.data)
 		{
