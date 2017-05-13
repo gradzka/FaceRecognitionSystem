@@ -1,7 +1,7 @@
 #include "ImgProc.h"
 
-#define crop_width 92
-#define crop_height 112
+#define crop_width 200
+#define crop_height 200
 
 
 ImgProc::ImgProc()
@@ -9,8 +9,9 @@ ImgProc::ImgProc()
 	//face_cascade_name = "haarcascade_frontalface_alt.xml";
 	face_cascade_name = "lbpcascade_frontalface.xml";
 	window_name = "Hello Face!";
+	model = cv::createEigenFaceRecognizer();
 	//model = cv::createLBPHFaceRecognizer();
-	model = cv::createFisherFaceRecognizer();
+	//model = cv::createFisherFaceRecognizer();
 	isModelTrained = false;
 	//model->set("threshold", 150.0);
 }
@@ -196,7 +197,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	std::cout << std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
-	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch1";
+	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch0";
 
 	if (face_cascade.load(face_cascade_name))
 	{
@@ -210,12 +211,28 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		double predicted_confidence = 0.0;
 		int unrecogizedPeople = 0;
 		int positionInFile = 1;
-		if (!vcap.open(videoStreamAdress))
+		
+		char answer;
+		do
 		{
-			std::cout << "Error opening video stream or file." << std::endl;
-			return;
+			std::cout << "1 - run FaceRecognizer in endless mode" << std::endl;
+			std::cout << "2 - run FaceRecognizer in time mode" << std::endl;
+			std::cin >> answer;
+		} while (answer != '1' && answer != '2');
+
+		int secs = 0;
+		if (answer == '2')
+		{
+			std::string runTime = "";
+			int h, m, s, z = 0;
+			do
+			{
+				std::cout << "Type duration time of FaceRecognizer in format HH:mm:ss" << std::endl;
+				std::cin >> runTime;
+			} while (sscanf(runTime.c_str(), "%d:%d:%d", &h, &m, &s) != 3);
+			secs = h * 3600 + m * 60 + s;
 		}
-		std::cout << "People recognition module has started..." << std::endl;
+
 		int frameID = -1;
 
 		//Create file with presences info
@@ -234,46 +251,104 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 			pfile.open(fileName, std::fstream::out);
 			if (pfile.is_open())
 			{
-				while (true)
+				if (!vcap.open(videoStreamAdress))
 				{
-					if (vcap.read(image))
-					{
-						frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
-						if (frameID % 10 == 0 && frameID != 0)
-						{
-							face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-							//std::cout << faces.size() << std::endl;
-							for (unsigned i = 0; i < faces.size(); i++)
-							{
-								cvtColor(image, img_gray, CV_BGR2GRAY);
-								img_cut = img_gray(faces[i]);
-								resize(img_cut, img_resized, cv::Size(crop_width, crop_height), 1.0, 1.0, cv::INTER_CUBIC);
-								model->predict(img_resized, plabel, predicted_confidence);
-								
-								if (plabel < 0)
-								{
-									std::cout << "Unrecognized person!"<< std::endl;
-									unrecogizedPeople++;
-								}
-								else if (predictedPeople.count(plabel) == 0)
-								{								
-									predictedPeople[plabel] = peopleBase[plabel];
-									pfile << positionInFile << "." << " " << predictedPeople[plabel] << std::endl;
-									positionInFile++;
+					std::cout << "Error opening video stream or file." << std::endl;
+					return;
+				}
+				std::cout << "People recognition module has started..." << std::endl;
 
-								}
-						
-								if (plabel > 0)
+				if (answer == '1') 
+				{
+					while (true)
+					{
+						if (vcap.read(image))
+						{
+							frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
+							if (frameID % 25 == 0 && frameID != 0)
+							{
+								face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+								//std::cout << faces.size() << std::endl;
+								for (unsigned i = 0; i < faces.size(); i++)
 								{
-									std::cout << "Predicted person: " << predictedPeople[plabel] <<
-										" with confidence: " << predicted_confidence <<
-										"." << std::endl;
-									//imshow("Sample", img_resized);
-									//imshow("Predicted", images[10 * plabel]);
+									cvtColor(image, img_gray, CV_BGR2GRAY);
+									img_cut = img_gray(faces[i]);
+									resize(img_cut, img_resized, cv::Size(crop_width, crop_height), 1.0, 1.0, cv::INTER_CUBIC);
+									model->predict(img_resized, plabel, predicted_confidence);
+
+									if (plabel < 0)
+									{
+										std::cout << "Unrecognized person!" << std::endl;
+										unrecogizedPeople++;
+									}
+									else if (predictedPeople.count(plabel) == 0)
+									{
+										predictedPeople[plabel] = peopleBase[plabel];
+										pfile << positionInFile << "." << " " << predictedPeople[plabel] << std::endl;
+										positionInFile++;
+
+									}
+
+									if (plabel >= 0)
+									{
+										std::cout << "Predicted person: " << predictedPeople[plabel] <<
+											" with confidence: " << predicted_confidence <<
+											"." << std::endl;
+										imshow("Sample", img_resized);
+										imshow("Predicted", images[5 * plabel]);
+									}
 								}
 							}
+							cv::waitKey(1);
 						}
-						cv::waitKey(1);
+					}
+				}
+				else
+				{
+					std::chrono::time_point<std::chrono::steady_clock> end;
+					auto start = std::chrono::steady_clock::now();
+					while (std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<secs)
+					{
+						end = std::chrono::steady_clock::now();
+						if (vcap.read(image))
+						{
+							frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
+							if (frameID % 25 == 0 && frameID != 0)
+							{
+								face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
+								//std::cout << faces.size() << std::endl;
+								for (unsigned i = 0; i < faces.size(); i++)
+								{
+									cvtColor(image, img_gray, CV_BGR2GRAY);
+									img_cut = img_gray(faces[i]);
+									resize(img_cut, img_resized, cv::Size(crop_width, crop_height), 1.0, 1.0, cv::INTER_CUBIC);
+									model->predict(img_resized, plabel, predicted_confidence);
+
+									if (plabel < 0)
+									{
+										std::cout << "Unrecognized person!" << std::endl;
+										unrecogizedPeople++;
+									}
+									else if (predictedPeople.count(plabel) == 0)
+									{
+										predictedPeople[plabel] = peopleBase[plabel];
+										pfile << positionInFile << "." << " " << predictedPeople[plabel] << std::endl;
+										positionInFile++;
+
+									}
+
+									if (plabel >= 0)
+									{
+										std::cout << "Predicted person: " << predictedPeople[plabel] <<
+											" with confidence: " << predicted_confidence <<
+											"." << std::endl;
+										imshow("Sample", img_resized);
+										imshow("Predicted", images[5 * plabel]);
+									}
+								}
+							}
+							cv::waitKey(1);
+						}
 					}
 				}
 				pfile << unrecogizedPeople << " - " << "unrecognized people!" << std::endl;
@@ -295,6 +370,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	{
 		std::cout << "Creating presence file has been corrupted!" << ::std::endl;
 	}
+	std::cout << "FaceRecognizer was stopped successfully." << std::endl;
 }
 
 cv::Mat ImgProc::cropFace(cv::Mat img)
