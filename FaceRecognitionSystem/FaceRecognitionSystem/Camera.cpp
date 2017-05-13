@@ -13,7 +13,8 @@ Camera::~Camera()
 
 double Camera::getFPS()
 {
-	std::cout << "Configuration of IP camera settings. Wait..." << std::endl;
+	std::cout << "Configuration of IP camera settings. Wait... " << std::endl;
+	Utilities::dashes();
 	cv::VideoCapture vcap;
 	cv::Mat image;
 	const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch1";
@@ -38,17 +39,23 @@ double Camera::getFPS()
 }
 void Camera::CaptureFrame()
 {
+	Utilities::dashes();
 	std::string dirName;
-	std::cout << std::endl;
-	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
+	std::cout << "Type directory name where pictures will be stored" << std::endl;
+	std::cout << "Type: ";
 
 	//Utilities::cleanBuffer();
 	
 	std::getline(std::cin, dirName);
-	std::cout << "Type number of pictures that will be made:" << std::endl;
+	Utilities::dashes();
+	std::cout << "Type number of pictures that will be made" << std::endl;
+	std::cout << "Type: ";
+	std::cout << std::endl;
+	Utilities::dashes();
 	int numberOfPictures = 0;
 	std::cin >> numberOfPictures;
-	std::cout << "wait..." << std::endl;
+	std::cout << std::endl;
+	Utilities::dashes();
 
 	if (numberOfPictures > 0) {
 		std::experimental::filesystem::create_directory("screenshots/");
@@ -119,7 +126,8 @@ void Camera::CaptureFrame()
 			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));		
 		} while (numberOfPictures > 0);
 		Beep(1568, 1000);
-		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;	
+		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;
+		Utilities::dashes();
 	}
 	else
 	{
@@ -131,16 +139,18 @@ void Camera::CaptureFrameToCorp()
 {
 	std::string dirName;
 	std::cout << std::endl;
-	std::cout << "Type directory name where the pictures will be stored:" << std::endl;
+	Utilities::dashes();
+	std::cout << "Type directory name where the pictures will be stored" << std::endl;
+	std::cout << "Type: ";
 
 	//Utilities::cleanBuffer();
-
 	std::getline(std::cin, dirName);
-	std::cout << "Type number of pictures that will be made:" << std::endl;
+	Utilities::dashes();
+	std::cout << "Type number of pictures that will be made" << std::endl;
+	std::cout << "Type: ";
 	int numberOfPictures = 0;
 	std::cin >> numberOfPictures;
-	std::cout << "wait..." << std::endl;
-
+	Utilities::dashes();
 	if (numberOfPictures > 0) {
 		std::experimental::filesystem::create_directory("screenshots/");
 		//create folder, where images will be stored
@@ -149,6 +159,7 @@ void Camera::CaptureFrameToCorp()
 		double fps = getFPS(); //number of frame per second
 		if (fps == 0) {
 			std::cout << "Error opening video stream" << std::endl;
+			Utilities::dashes();
 			return;
 		}
 
@@ -163,15 +174,17 @@ void Camera::CaptureFrameToCorp()
 		cv::VideoCapture vcap;
 		cv::Mat image;
 		cv::Mat croppedImage;
-		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch1";
+		const std::string videoStreamAdress = "rtsp://" + this->USERPWD + "@" + this->IPAddress + "/live/ch0";
 
 		if (!vcap.open(videoStreamAdress))
 		{
 			std::cout << "Error opening video stream or file" << std::endl;
+			Utilities::dashes();
 			return;
 		}
 		//vcap.set(CV_CAP_PROP_FPS, fps);	
-
+		std::cout << "Screenshots are being taking..." << std::endl;
+		Utilities::dashes();
 		do {
 			frameID = vcap.get(CV_CAP_PROP_POS_FRAMES);//current frame number
 			time = std::time(NULL);
@@ -199,25 +212,29 @@ void Camera::CaptureFrameToCorp()
 				else
 				{
 					std::cout << "No frame captured!" << std::endl;
+					Utilities::dashes();
 					return;
 				}
 			}
 			else
 			{
 				std::cout << "Problem with file creation!" << std::endl;
+				Utilities::dashes();
 				return;
 			}
 
 			//std::this_thread::sleep_for(std::chrono::milliseconds(1000));		
 		} while (numberOfPictures > 0);
 		Beep(1568, 1000);
-		std::cout << "Success! Your screenshot/s in dir " << dirName << "." << std::endl;
+		std::cout << "Success! Your screenshot/s in dir " << dirName<< std::endl;
+		Utilities::dashes();
 	}
 	else
 	{
 		std::cout << "Error! No screenshots were taken." << std::endl;
+		Utilities::dashes();
 	}
-	std::cout << "Type:";
+	std::cout << "Type: ";
 }
 void Camera::sendMessage(char command)
 {
@@ -326,16 +343,16 @@ bool Camera::testConnectionCurl()
 }
 void Camera::testConnection(Camera *& camera) 
 {
-	std::cout << "Test connection" << std::endl;
-	std::cout << "wait..." << std::endl;
+	std::cout << "Test connection. Wait... " << std::endl;
+	Utilities::dashes();
 	if (camera->testConnectionCurl() == true)
 	{
-		std::cout << "Test connection succeeded" << std::endl;
+		std::cout << "Test connection has been succeeded" << std::endl;
 	}
 	else
 	{
 		camera = NULL;
-		std::cout << "Test connection failed" << std::endl;
+		std::cout << "Test connection has been failed" << std::endl;
 	}
 	Utilities::dashes();
 }

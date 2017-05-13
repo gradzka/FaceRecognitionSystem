@@ -82,7 +82,10 @@ bool ImgProc::createCSV()
 
 void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 {
-	std::cout<<std::endl << "wait..." << std::endl;
+	std::cout << std::endl;
+	Utilities::dashes();
+	std::cout<< "Estimation is in progress. Wait..." << std::endl;
+	Utilities::dashes();
 	cv::VideoCapture vcap;
 	cv::Mat image;
 	const std::string videoStreamAdress = "rtsp://"+userPwd+"@"+addressIP+":80/live/ch1";
@@ -90,6 +93,7 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 	if (!vcap.open(videoStreamAdress))
 	{
 		std::cout << "Error opening video stream or file." << std::endl;
+		Utilities::dashes();
 		return;
 	}
 	if (face_cascade.load(face_cascade_name))
@@ -103,15 +107,15 @@ void ImgProc::countPeople(std::string userPwd, std::string addressIP)
 				cv::waitKey(1);
 			}
 		}
-		std::cout << "Number of detected people: " << round((double)peopleNo / 10) << "." << std::endl << std::endl;
+		std::cout << "Number of detected people: " << round((double)peopleNo / 10) << "." << std::endl;
 	}
 	else
 	{
 		std::cout << face_cascade_name + " not found." << std::endl;
 	}
 	vcap.release();
-	std::cout << "HELP - C" << std::endl;
-	std::cout << "Type: ";
+	Utilities::PrintEnd();
+
 }
 void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & images, std::vector<int> & labels)
 {
@@ -139,62 +143,72 @@ void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & imag
 }
 void ImgProc::TrainFaceRecognizer()
 {
+	std::cout << std::endl;
 	Utilities::cleanBuffer();
+	Utilities::dashes();
 	char yesNo;
 	if (std::experimental::filesystem::exists("trainFR.xml") && !std::experimental::filesystem::is_empty("trainFR.xml"))
 	{
-		std::cout << std::endl<< "Do you want to load training data from trainFR.xml file?: Yes[Y]/No[N]\n";
+		std::cout << "Do you want to load training data from trainFR.xml file?"<<std::endl;
+		std::cout<<"Type Yes[Y]/No[N]: ";
 		yesNo = (char)getchar();
+		Utilities::dashes();
 		while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
 		{
-			std::cout << "\nType: Yes[Y]/No[N]\n";
+			std::cout << "\nType Yes[Y]/No[N]: ";
 			yesNo = (char)getchar();
-		}		
+			Utilities::dashes();
+		}
 		if (yesNo == 'Y' || yesNo == 'y')
 		{
-			std::cout << "wait..." << std::endl;
+			std::cout << "Training data is being loaded from trainFR.xml file. Wait... " << std::endl;
+			Utilities::dashes();
 			model->load("trainFR.xml");
 			createCSV();
 			read_csv("corp.csv", images, labels);
 			isModelTrained = true;
-			std::cout << "Face recognizer training data load successfully!" << std::endl;
-			std::cout <<std::endl<< "HELP - C" << std::endl;
-			std::cout << "Type:";
+			std::cout << "Face recognizer training data has been loaded successfully!" << std::endl;
+			Utilities::PrintEnd();
 			return;
 		}
 	}
 
-	std::cout << "wait..." << std::endl;
+	std::cout << "Face recognizer model is being trained. Wait... " << std::endl;
+	Utilities::dashes();
 	createCSV();
 	read_csv("corp.csv", images, labels);
 	model->train(images, labels);
-	std::cout << "Face recognizer has trained successfully!" << std::endl;
+	std::cout << "Face recognizer model has been trained successfully!" << std::endl;
+	Utilities::dashes();
 	isModelTrained = true;
-	std::cout << "Do you want to save training data in trainFR.xml file?: Yes[Y]/No[N]\n";
+	std::cout << "Do you want to save training data in trainFR.xml file?" << std::endl;
+	std::cout<<"Type Yes[Y]/No[N]: ";
 	std::cin.ignore();
 	yesNo = (char)getchar();
 	while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
 	{
-		std::cout << "\nType: Yes[Y]/No[N]\n";
+		Utilities::dashes();
+		std::cout << "\nType: Yes[Y]/No[N]: ";
 		yesNo = (char)getchar();
 	}
 	if (yesNo == 'Y' || yesNo == 'y')
 	{
-		std::cout << std::endl << "wait..." << std::endl;
+		Utilities::dashes();
+		std::cout <<"Training data is being saved in trainFR.xml file. Wait... " << std::endl;
+		Utilities::dashes();
 		model->save("trainFR.xml");
-		std::cout << "Training data has saved successfully!" << std::endl;
+		std::cout << "Training data has been saved successfully!" << std::endl;
 	}
-	std::cout << std::endl<< "HELP - C" << std::endl;
-	std::cout << "Type:";
+	Utilities::PrintEnd();
 }
 void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 {
 	if (isModelTrained==false)
 	{
 		std::cout << "Error! Model is not trained!" << std::endl;
+		Utilities::dashes();
 		return;
 	}
-	std::cout << std::endl << "wait..." << std::endl;
 	cv::VideoCapture vcap;
 	cv::Mat image;
 	const std::string videoStreamAdress = "rtsp://" + userPwd + "@" + addressIP + ":80/live/ch0";
@@ -215,9 +229,12 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		char answer;
 		do
 		{
-			std::cout << "1 - run FaceRecognizer in endless mode" << std::endl;
+			std::cout << std::endl<< "1 - run FaceRecognizer in endless mode" << std::endl;
 			std::cout << "2 - run FaceRecognizer in time mode" << std::endl;
-			std::cin >> answer;
+			Utilities::dashes();
+			std::cout << "Type: ";
+			answer=getchar();
+			Utilities::dashes();
 		} while (answer != '1' && answer != '2');
 
 		int secs = 0;
@@ -228,11 +245,15 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 			do
 			{
 				std::cout << "Type duration time of FaceRecognizer in format HH:mm:ss" << std::endl;
+				std::cout << "Type: ";
 				std::cin >> runTime;
+				Utilities::dashes();
 			} while (sscanf(runTime.c_str(), "%d:%d:%d", &h, &m, &s) != 3);
 			secs = h * 3600 + m * 60 + s;
 		}
 
+		std::cout << "Configuration procedures are ongoing. Wait..." << std::endl;
+		Utilities::dashes();
 		int frameID = -1;
 
 		//Create file with presences info
@@ -254,9 +275,11 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 				if (!vcap.open(videoStreamAdress))
 				{
 					std::cout << "Error opening video stream or file." << std::endl;
+					Utilities::dashes();
 					return;
 				}
 				std::cout << "People recognition module has started..." << std::endl;
+				Utilities::dashes();
 
 				if (answer == '1') 
 				{
@@ -294,8 +317,8 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 										std::cout << "Predicted person: " << predictedPeople[plabel] <<
 											" with confidence: " << predicted_confidence <<
 											"." << std::endl;
-										imshow("Sample", img_resized);
-										imshow("Predicted", images[5 * plabel]);
+										//imshow("Sample", img_resized);
+										//imshow("Predicted", images[5 * plabel]);
 									}
 								}
 							}
@@ -342,12 +365,12 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 										std::cout << "Predicted person: " << predictedPeople[plabel] <<
 											" with confidence: " << predicted_confidence <<
 											"." << std::endl;
-										imshow("Sample", img_resized);
-										imshow("Predicted", images[5 * plabel]);
+										//imshow("Sample", img_resized);
+										//imshow("Predicted", images[5 * plabel]);
 									}
 								}
 							}
-							cv::waitKey(1);
+							//cv::waitKey(1);
 						}
 					}
 				}
@@ -370,7 +393,9 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 	{
 		std::cout << "Creating presence file has been corrupted!" << ::std::endl;
 	}
-	std::cout << "FaceRecognizer was stopped successfully." << std::endl;
+	Utilities::dashes();
+	std::cout << "Face recognition has been ended." << std::endl;
+	Utilities::PrintEnd();
 }
 
 cv::Mat ImgProc::cropFace(cv::Mat img)

@@ -17,9 +17,10 @@ bool checkKeyboard(Camera *camera, char key)
 	//checkKeyboard(camera, VK_FR);			//Recognize face (R)
 	//state=checkKeyboard(camera, VK_ESCAPE);	//exit	
 
-	if (key == VK_EXIT) { return 1; }
-	if (key == VK_COMMAND) { Utilities::printCommandList(); }
-	if (key == VK_PICTURE) { Utilities::cleanBuffer(); }
+	if (key == VK_EXIT) { std::cout << key; return 1; }
+	if (key == VK_COMMAND) { std::cout << key; Utilities::printCommandList(); }
+	if (key == VK_PICTURE) { std::cout << key; Utilities::cleanBuffer(); }
+	if (key==VK_ESTIMATE){std::cout << key; }
 	camera->sendMessage(key);
 
 	
@@ -46,7 +47,7 @@ void t_keyboard(Camera *camera)
 	while (!state)
 	{		
 		button = _getch();
-		checkKeyboard(camera, button);
+		state=checkKeyboard(camera, button);
 	}
 }
 void printLogo()
@@ -71,14 +72,14 @@ Camera* cameraConfiguration()
 	std::cout << std::endl << "      *** Connection configuration with IP camera. ***" << std::endl << std::endl;
 	Utilities::dashes();
 	std::cout << "Type:" << std::endl;
-	std::cout << "1 - manual configuration," << std::endl;
-	std::cout << "2 - load configuration from config file," << std::endl;
-	std::cout << "3 - create config file." << std::endl;
+	std::cout << "1 - manual configuration" << std::endl;
+	std::cout << "2 - load configuration from config file" << std::endl;
+	std::cout << "3 - create config file" << std::endl;
 	Utilities::dashes();
 	int choice = 0;
 
 	do {
-		std::cout << "Choice: ";
+		std::cout << "Type: ";
 		std::cin >> choice;
 		Utilities::dashes();
 	} while (choice<=0 || choice>3);
@@ -161,10 +162,7 @@ int main(int argc, char *argv[])
 
 	//Camera * camera = new Camera("IP","login:password");
 	std::cout << std::endl << "      ***    Welcome in Face Recognition System    ***" << std::endl << std::endl;
-	Utilities::dashes();
-	std::cout << "HELP - C" << std::endl;
-	Utilities::dashes();
-	std::cout << "Type: ";
+	Utilities::PrintEnd();
 	
 	if (argc<=1) //no parameters
 	{
