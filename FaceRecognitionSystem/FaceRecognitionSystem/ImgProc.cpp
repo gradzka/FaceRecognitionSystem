@@ -6,14 +6,10 @@
 
 ImgProc::ImgProc()
 {
-	//face_cascade_name = "haarcascade_frontalface_alt.xml";
 	face_cascade_name = "lbpcascade_frontalface.xml";
-	window_name = "Hello Face!";
-	model = cv::createEigenFaceRecognizer();
-	//model = cv::createLBPHFaceRecognizer();
-	//model = cv::createFisherFaceRecognizer();
+	model = cv::createFisherFaceRecognizer();
 	isModelTrained = false;
-	//model->set("threshold", 150.0);
+	model->set("threshold", 3000.0);
 }
 
 
@@ -27,26 +23,8 @@ int ImgProc::detectFace(cv::Mat img)
 
 	cvtColor(img, img_gray, CV_BGR2GRAY);
 	cv::equalizeHist(img_gray, img_gray);
-	//const int scale = 2;
 
 	face_cascade.detectMultiScale(img_gray, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-	/*int percentheigth = 0;
-	int percentwidth = 0;
-	for (unsigned i = 0; i < faces.size(); i++)
-	{
-		/*percentheigth = 0.4*faces[i].height;
-		faces[i].height *= 2;
-		faces[i].y *= 2;
-
-		percentwidth = 0.4*faces[i].width;
-		faces[i].width *= 2;
-		faces[i].x *= 2;
-
-		cv::Rect rect_face(faces[i]);
-		rectangle(img, rect_face, cv::Scalar(120, 5, 86), 2, 2, 0);
-	}*/
-	//imshow(window_name, img);
-
 	return faces.size();
 }
 
@@ -131,13 +109,10 @@ void ImgProc::read_csv(const std::string & filename, std::vector<cv::Mat> & imag
 		std::stringstream liness(line);
 		getline(liness, path, ';');
 		getline(liness, classlabel);
-		//classlabel.erase(0, 1);
-		//path.erase(path.length() - 1, path.length());
 		if (!path.empty() && !classlabel.empty())
 		{
 			images.push_back(cv::imread(path, 0));
 			labels.push_back(atoi(classlabel.c_str()));
-			//std::cout << path << "=" << atoi(classlabel.c_str()) << std::endl;
 		}
 	}
 }
@@ -151,12 +126,12 @@ void ImgProc::TrainFaceRecognizer()
 	{
 		std::cout << "Do you want to load training data from trainFR.xml file?"<<std::endl;
 		std::cout<<"Type Yes[Y]/No[N]: ";
-		yesNo = (char)getchar();
+		std::cin >> yesNo;
 		Utilities::dashes();
 		while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
 		{
 			std::cout << "\nType Yes[Y]/No[N]: ";
-			yesNo = (char)getchar();
+			std::cin >> yesNo;
 			Utilities::dashes();
 		}
 		if (yesNo == 'Y' || yesNo == 'y')
@@ -164,8 +139,8 @@ void ImgProc::TrainFaceRecognizer()
 			std::cout << "Training data is being loaded from trainFR.xml file. Wait... " << std::endl;
 			Utilities::dashes();
 			model->load("trainFR.xml");
-			createCSV();
-			read_csv("corp.csv", images, labels);
+			//createCSV();
+			//read_csv("corp.csv", images, labels);
 			isModelTrained = true;
 			std::cout << "Face recognizer training data has been loaded successfully!" << std::endl;
 			Utilities::PrintEnd();
@@ -183,13 +158,17 @@ void ImgProc::TrainFaceRecognizer()
 	isModelTrained = true;
 	std::cout << "Do you want to save training data in trainFR.xml file?" << std::endl;
 	std::cout<<"Type Yes[Y]/No[N]: ";
-	std::cin.ignore();
-	yesNo = (char)getchar();
+
+	std::cin >> yesNo;
+	//std::cout << yesNo << std::endl;;
+	//yesNo = (char)getchar();
+	//getchar();
+	
 	while ((yesNo != 'N' && yesNo != 'n') && (yesNo != 'Y' && yesNo != 'y'))
 	{
 		Utilities::dashes();
-		std::cout << "\nType: Yes[Y]/No[N]: ";
-		yesNo = (char)getchar();
+		std::cout << "Type: Yes[Y]/No[N]: ";
+		std::cin >> yesNo;
 	}
 	if (yesNo == 'Y' || yesNo == 'y')
 	{
@@ -200,13 +179,14 @@ void ImgProc::TrainFaceRecognizer()
 		std::cout << "Training data has been saved successfully!" << std::endl;
 	}
 	Utilities::PrintEnd();
+
 }
 void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 {
 	if (isModelTrained==false)
 	{
 		std::cout << "Error! Model is not trained!" << std::endl;
-		Utilities::dashes();
+		Utilities::PrintEnd();
 		return;
 	}
 	cv::VideoCapture vcap;
@@ -227,13 +207,14 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 		int positionInFile = 1;
 		
 		char answer;
+		std::cout << std::endl;
 		do
 		{
-			std::cout << std::endl<< "1 - run FaceRecognizer in endless mode" << std::endl;
+			std::cout << "1 - run FaceRecognizer in endless mode" << std::endl;
 			std::cout << "2 - run FaceRecognizer in time mode" << std::endl;
 			Utilities::dashes();
 			std::cout << "Type: ";
-			answer=getchar();
+			std::cin >> answer;
 			Utilities::dashes();
 		} while (answer != '1' && answer != '2');
 
@@ -291,7 +272,6 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 							if (frameID % 25 == 0 && frameID != 0)
 							{
 								face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-								//std::cout << faces.size() << std::endl;
 								for (unsigned i = 0; i < faces.size(); i++)
 								{
 									cvtColor(image, img_gray, CV_BGR2GRAY);
@@ -339,7 +319,6 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 							if (frameID % 25 == 0 && frameID != 0)
 							{
 								face_cascade.detectMultiScale(image, faces, 1.1, 3, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(20, 20));
-								//std::cout << faces.size() << std::endl;
 								for (unsigned i = 0; i < faces.size(); i++)
 								{
 									cvtColor(image, img_gray, CV_BGR2GRAY);
@@ -374,7 +353,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 						}
 					}
 				}
-				pfile << unrecogizedPeople << " - " << "unrecognized people!" << std::endl;
+				pfile << "Number of tries of unrecognized people: " << unrecogizedPeople << "!" << std::endl;
 				pfile.close();
 			}
 			else

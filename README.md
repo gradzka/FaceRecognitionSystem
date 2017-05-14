@@ -17,9 +17,9 @@ Project is based on simple console interface used to manipulate IP camera and st
 - [x] face detection,
 - [x] count people,
 - [X] start learning algorithm,
-- [ ] program modes,
-- [ ] face recognition,
-- [ ] save results in log file,
+- [X] program modes,
+- [X] face recognition,
+- [X] save results in log file,
 - [ ] errors handling, tests.
 
 ## Tools
@@ -31,7 +31,7 @@ Microsoft Visual Studio 2017
 
 ## Attributions
 * http://opencv.org/
-* https://github.com/yushulx/libcurl-sample
+* https://youtu.be/Eu7NFeg43T4
 * http://www.cplusplus.com/forum/windows/105443/#msg569057
 * http://stackoverflow.com/a/25383466
 * http://stackoverflow.com/a/106223
@@ -41,6 +41,9 @@ Microsoft Visual Studio 2017
 * http://stackoverflow.com/questions/236129/split-a-string-in-c
 * http://forbot.pl/blog/artykuly/programowanie/opencv-3-detekcja-i-rozpoznawanie-twarzy-id5664
 * https://www.learnopencv.com/how-to-find-frame-rate-or-frames-per-second-fps-in-opencv-python-cpp/
+* http://stackoverflow.com/a/37494654
+* http://stackoverflow.com/a/24271424
+* http://stackoverflow.com/a/18685338
 
 ## License
 MIT

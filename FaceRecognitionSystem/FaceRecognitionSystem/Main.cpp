@@ -20,7 +20,7 @@ bool checkKeyboard(Camera *camera, char key)
 	if (key == VK_EXIT) { std::cout << key; return 1; }
 	if (key == VK_COMMAND) { std::cout << key; Utilities::printCommandList(); }
 	if (key == VK_PICTURE) { std::cout << key; Utilities::cleanBuffer(); }
-	if (key==VK_ESTIMATE){std::cout << key; }
+	if (key==VK_ESTIMATE || key == VK_TRAIN_FR){std::cout << key; }
 	camera->sendMessage(key);
 
 	
