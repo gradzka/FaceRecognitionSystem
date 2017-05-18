@@ -139,7 +139,7 @@ void ImgProc::TrainFaceRecognizer()
 			std::cout << "Training data is being loaded from trainFR.xml file. Wait... " << std::endl;
 			Utilities::dashes();
 			model->load("trainFR.xml");
-			//createCSV();
+			createCSV();
 			//read_csv("corp.csv", images, labels);
 			isModelTrained = true;
 			std::cout << "Face recognizer training data has been loaded successfully!" << std::endl;
@@ -353,7 +353,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 						}
 					}
 				}
-				pfile << "Number of tries of unrecognized people: " << unrecogizedPeople << "!" << std::endl;
+				pfile << "Number of tries of unrecognizing people: " << unrecogizedPeople << "!" << std::endl;
 				pfile.close();
 			}
 			else

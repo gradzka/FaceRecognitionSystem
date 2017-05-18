@@ -674,6 +674,5 @@ std::string AES::aes_decrypt(std::string key)
 	}
 
 	delete sha256;
-
 	return plaintext;
 }
