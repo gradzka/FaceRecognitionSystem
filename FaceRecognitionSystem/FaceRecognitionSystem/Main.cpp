@@ -69,31 +69,31 @@ void printLogo()
 }
 Camera* cameraConfiguration()
 {
-	std::cout << std::endl << "      *** Connection configuration with IP camera. ***" << std::endl << std::endl;
+	std::cout << std::endl << "      *** Connection configuration with IP camera ***" << std::endl << std::endl;
 	Utilities::dashes();
 	std::cout << "Type:" << std::endl;
 	std::cout << "1 - manual configuration" << std::endl;
 	std::cout << "2 - load configuration from config file" << std::endl;
 	std::cout << "3 - create config file" << std::endl;
 	Utilities::dashes();
-	int choice = 0;
+	std::string choice = "";
 
 	do {
 		std::cout << "Type: ";
 		std::cin >> choice;
 		Utilities::dashes();
-	} while (choice<=0 || choice>3);
+	} while (choice!="1" && choice != "2" && choice != "3");
 
 	Camera* camera = NULL;
 
-	switch (choice)
+	switch ((int)choice[0])
 	{
-		case 1:
+		case '1':
 		{
 			camera = camera->typeCameraData();
 			break;
 		}
-		case 2:
+		case '2':
 		{
 			AES *aes = new AES();
 
@@ -122,7 +122,7 @@ Camera* cameraConfiguration()
 			}
 			break;
 		}
-		case 3:
+		case '3':
 		{
 			camera = camera->typeCameraData();
 			if (camera != NULL)
@@ -164,14 +164,9 @@ int main(int argc, char *argv[])
 	std::cout << std::endl << "      ***    Welcome in Face Recognition System    ***" << std::endl << std::endl;
 	Utilities::PrintEnd();
 	
-	if (argc<=1) //no parameters
-	{
-		t_keyboard(camera);
-	}
-	else //time parameter (in minutes)
-	{
-		//TODO
-	}
+
+	t_keyboard(camera);
+	
 
 	curl_global_cleanup();
 	delete camera;

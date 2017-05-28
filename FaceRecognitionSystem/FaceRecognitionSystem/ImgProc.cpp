@@ -7,9 +7,9 @@
 ImgProc::ImgProc()
 {
 	face_cascade_name = "lbpcascade_frontalface.xml";
-	model = cv::createFisherFaceRecognizer();
+	model = cv::createLBPHFaceRecognizer();//cv::createFisherFaceRecognizer();
 	isModelTrained = false;
-	model->set("threshold", 3000.0);
+	model->set("threshold", 100.0);
 }
 
 

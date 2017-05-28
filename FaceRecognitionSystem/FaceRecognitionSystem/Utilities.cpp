@@ -60,7 +60,7 @@ void Utilities::maskPassword(std::string &password)
 	{
 		c = _getch();
 		if (c == 13) { break; } //13 - ENTER
-		else if (c == 8)
+		else if (c == 8 && password.length() != 0)
 		{
 			password.pop_back();
 		}
