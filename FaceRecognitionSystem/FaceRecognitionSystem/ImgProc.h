@@ -11,6 +11,9 @@
 #include <conio.h>
 #include "Utilities.h"
 #include <map>
+#include <thread>
+#include <atomic>
+
 class ImgProc
 {
 	std::map <int, std::string> peopleBase; //people from picture base in /screenshots/... <label, folder name>

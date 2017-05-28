@@ -3,7 +3,6 @@
 #define crop_width 200
 #define crop_height 200
 
-
 ImgProc::ImgProc()
 {
 	face_cascade_name = "lbpcascade_frontalface.xml";
@@ -259,12 +258,25 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 					Utilities::dashes();
 					return;
 				}
+
+				std::atomic<bool> done(false);
+				std::thread t([&done] {
+					char input = '0';
+					while (input != 'q' && input != 'Q')
+					{
+						input = _getch();
+					}
+					done = true;
+				});
+				t.detach();
+
 				std::cout << "People recognition module has started..." << std::endl;
+				std::cout << "You can always quit this module by pressing Q button." << std::endl;
 				Utilities::dashes();
 
 				if (answer == '1') 
 				{
-					while (true)
+					while (!done)
 					{
 						if (vcap.read(image))
 						{
@@ -310,7 +322,7 @@ void ImgProc::predictPerson(std::string userPwd, std::string addressIP)
 				{
 					std::chrono::time_point<std::chrono::steady_clock> end;
 					auto start = std::chrono::steady_clock::now();
-					while (std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<secs)
+					while (std::chrono::duration_cast<std::chrono::seconds>(end - start).count()<secs && !done)
 					{
 						end = std::chrono::steady_clock::now();
 						if (vcap.read(image))
