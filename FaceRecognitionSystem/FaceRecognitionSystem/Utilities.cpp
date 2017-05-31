@@ -139,8 +139,7 @@ BYTE * Utilities::ReadFromBinFile(std::string fileName)
 	}
 	else
 	{
-		std::cout << fileName << " is corrupted!" << std::endl;
-		fclose(file);
+		//std::cout << fileName << " is corrupted!" << std::endl;
 		return NULL;
 	}	
 }
@@ -157,9 +156,9 @@ int Utilities::BinFileElementsNo(std::string fileName)
 
 		fseek(file, 0, SEEK_END);
 		lSize = ftell(file);
-	}
 
-	fclose(file);
+		fclose(file);
+	}
 	return lSize;
 }
 

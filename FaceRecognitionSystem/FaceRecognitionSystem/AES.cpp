@@ -603,7 +603,15 @@ void AES::aes_encrypt(std::string SecretData, std::string key)
 	BYTE dec_buf[128];
 	BYTE plaintext[32];
 	BYTE initialValue[16] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f };
-	aes_key_setup(sha256->sha256_abbreviation(key), key_schedule, 256);
+	BYTE *abbKey = sha256->sha256_abbreviation(key);
+	
+	BYTE keyAES[32];
+	for (size_t i = 0; i < 32; i++)
+	{
+		keyAES[i] = abbKey[i];
+	}
+
+	aes_key_setup(keyAES, key_schedule, 256);
 
 	int secretDataLength = SecretData.length()+1;
 	BYTE *ByteSecretData = new BYTE[secretDataLength];
@@ -648,15 +656,26 @@ std::string AES::aes_decrypt(std::string key)
 	BYTE enc_buf[128];
 	BYTE dec_buf[128];
 	BYTE initialValue[16] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f }; //initial value
-	aes_key_setup(sha256->sha256_abbreviation(key), key_schedule, 256);
+	BYTE *abbKey = sha256->sha256_abbreviation(key);
+
+	BYTE keyAES[32];
+	for (size_t i = 0; i < 32; i++)
+	{
+		keyAES[i] = abbKey[i];
+	}
+
+	aes_key_setup(keyAES, key_schedule, 256);
 
 	BYTE *data = Utilities::ReadFromBinFile("config.bin");
-	int dataPointer = Utilities::BinFileElementsNo("config.bin");
+
 	std::string plaintext = "";
-	std::string plaintextTemp="";
+	std::string plaintextTemp = "";
 
 	if (data != NULL)
 	{
+		int dataPointer = Utilities::BinFileElementsNo("config.bin");
+
+
 		int packetNo = 0;
 		while (dataPointer > 0)
 		{
@@ -668,10 +687,10 @@ std::string AES::aes_decrypt(std::string key)
 			dataPointer -= 32;
 		}
 	}
-	else
+	/*else
 	{
 		std::cout << "config.bin is empty!" << std::endl;
-	}
+	}*/
 
 	delete sha256;
 	return plaintext;

@@ -114,6 +114,7 @@ Camera* cameraConfiguration()
 			{
 				std::cout << "Config file is missed or corrupted!\n\n";
 				camera = NULL;
+				Utilities::dashes();
 			}
 
 			if (camera!=NULL)
