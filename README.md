@@ -20,14 +20,10 @@ Project is based on simple console interface used to manipulate IP camera and st
 - [X] program modes,
 - [X] face recognition,
 - [X] save results in log file,
-- [ ] errors handling, tests.
+- [X] errors handling, tests.
 
 ## Tools
 Microsoft Visual Studio 2017
-
-## How to run
-
-## How to compile
 
 ## Attributions
 * http://opencv.org/
@@ -44,9 +40,6 @@ Microsoft Visual Studio 2017
 * http://stackoverflow.com/a/37494654
 * http://stackoverflow.com/a/24271424
 * http://stackoverflow.com/a/18685338
-
-## License
-MIT
 
 ## Credits
 * Monika Grądzka,
